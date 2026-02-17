@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freedom Directory — VexConnect</title>
+  <meta name="description" content="Every channel of communication and money, mapped. What's permissionless, what's not, and how to set it up.">
+  <style>
+    :root {
+      --green: #0EFFAF;
+      --green-deep: #009375;
+      --green-glow: rgba(14, 255, 175, 0.09);
+      --bg: #0a0a0a;
+      --bg-soft: #111;
+      --text: #d4d4d4;
+      --text-bright: #e8e8e8;
+      --text-dim: #888;
+      --max-width: 640px;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #fafaf9;
+        --bg-soft: #f0f0ee;
+        --text: #333;
+        --text-bright: #111;
+        --text-dim: #777;
+      }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      padding: 2.5rem 1.5rem;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.8rem; color: var(--green); margin-bottom: 0.25rem; font-weight: 700; }
+    .subtitle { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2rem; }
+    h2 { font-size: 1.15rem; color: var(--green); margin-top: 2.5rem; margin-bottom: 0.75rem; font-weight: 600; }
+    h3 { font-size: 1rem; color: var(--text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    p { margin-bottom: 1rem; }
+    strong { color: var(--text-bright); }
+    a { color: var(--green); text-decoration: none; border-bottom: 1px solid var(--green-glow); }
+    a:hover { border-bottom-color: var(--green); }
+    .card {
+      background: var(--bg-soft);
+      padding: 1rem 1.25rem;
+      margin: 0.75rem 0;
+      border-radius: 6px;
+      border-left: 3px solid var(--green-deep);
+    }
+    .card .name { color: var(--green); font-weight: 600; }
+    .card .meta { color: var(--text-dim); font-size: 0.85rem; }
+    .card .desc { margin-top: 0.3rem; font-size: 0.9rem; }
+    .tag { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.5rem; border-radius: 3px; margin-right: 0.3rem; }
+    .tag-free { background: rgba(14,255,175,0.15); color: var(--green); }
+    .tag-paid { background: rgba(255,200,0,0.15); color: #ffc800; }
+    .tag-nokyc { background: rgba(14,255,175,0.1); color: var(--green); border: 1px solid var(--green-deep); }
+    .stack-box {
+      background: var(--bg-soft);
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      line-height: 2;
+      color: var(--text-dim);
+    }
+    .stack-box strong { color: var(--green); }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--green-glow);
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+    nav { margin-bottom: 2rem; }
+    nav a { margin-right: 1rem; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+  <h1>The Freedom Directory</h1>
+  <p class="subtitle">Every channel has a kill switch held by someone who isn't you. This maps the ones that don't.</p>
+
+  <nav><a href="/">← VexConnect</a></nav>
+
+  <!-- SMS / PHONE -->
+  <h2>📱 Phone &amp; SMS</h2>
+  <p>Your phone number is not yours. Your carrier can kill it. These can't.</p>
+
+  <div class="card">
+    <span class="name">JMP.chat</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-paid">$4.99/mo</span>
+    <div class="meta">US/CA number · Bitcoin accepted · Open source</div>
+    <div class="desc">Real phone number via XMPP. SMS, MMS, calls on any device. No SIM needed. <a href="https://jmp.chat">jmp.chat</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Silent.link</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-paid">~$30 one-time</span>
+    <div class="meta">Global eSIM · Bitcoin/Lightning · 200+ countries</div>
+    <div class="desc">Actual eSIM with data + SMS. No name, no address. Pay with Bitcoin. <a href="https://silent.link">silent.link</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">MySudo</span>
+    <span class="tag tag-nokyc">Minimal KYC</span>
+    <span class="tag tag-paid">$0.99–14.99/mo</span>
+    <div class="meta">US/CA/UK · Up to 9 numbers</div>
+    <div class="desc">Multiple phone identities. No ID verification. App-based.</div>
+  </div>
+
+  <!-- EMAIL -->
+  <h2>📧 Email</h2>
+  <p>Gmail reads your mail. Outlook reads your mail. These don't.</p>
+
+  <div class="card">
+    <span class="name">Proton Mail</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free tier</span>
+    <div class="meta">Swiss · End-to-end encrypted · Custom domains · Bitcoin accepted</div>
+    <div class="desc">The gold standard. Free = 1 address, 500MB. Paid ($3.99/mo) = custom domain, 15GB. <a href="https://proton.me">proton.me</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Tuta</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free tier</span>
+    <div class="meta">German · End-to-end encrypted · Bitcoin accepted</div>
+    <div class="desc">Full encryption, own protocol. <a href="https://tuta.com">tuta.com</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Riseup</span>
+    <span class="tag tag-nokyc">Invite only</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Activist-run · No logs · US</div>
+    <div class="desc">Need an invite code. If you know, you know.</div>
+  </div>
+
+  <!-- INTERNET -->
+  <h2>🌐 Internet Access</h2>
+  <p>The connection itself. Ways to get online without asking permission.</p>
+
+  <div class="card">
+    <span class="name">Silent.link eSIM</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-paid">~$30</span>
+    <div class="meta">Mobile data in 200+ countries · Bitcoin</div>
+    <div class="desc">Real LTE connection. No name on it. <a href="https://silent.link">silent.link</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Yggdrasil Network</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Encrypted IPv6 overlay · Auto-discovers peers</div>
+    <div class="desc">Mesh overlay on existing internet. Every node routes for every other node. <a href="https://yggdrasil-network.github.io">yggdrasil</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Tor</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Onion routing · Global · Slow but unstoppable</div>
+    <div class="desc">Your traffic bounces through 3+ relays. Nobody knows who's talking to whom. <a href="https://torproject.org">torproject.org</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Meshtastic (LoRa)</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-paid">~$25 hardware</span>
+    <div class="meta">10-15km range · No internet needed · Unlicensed spectrum</div>
+    <div class="desc">Text + GPS over radio. No SIM, no subscription, no permission. $25 module, free forever. <a href="https://meshtastic.org">meshtastic.org</a></div>
+  </div>
+
+  <!-- MESSAGING -->
+  <h2>💬 Messaging</h2>
+  <p>Talk without someone in the middle.</p>
+
+  <div class="card">
+    <span class="name">Briar</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Android · BLE + WiFi + Tor · No server</div>
+    <div class="desc">End-to-end encrypted. Works with zero internet — over Bluetooth, WiFi, or Tor. Designed for journalists under surveillance. <a href="https://briarproject.org">briarproject.org</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Signal</span>
+    <span class="tag tag-paid">Needs phone #</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">All platforms · End-to-end encrypted</div>
+    <div class="desc">Best mainstream encrypted messenger. Needs a phone number (use JMP or Silent.link). <a href="https://signal.org">signal.org</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">SimpleX</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">No identifiers at all · No phone # needed</div>
+    <div class="desc">No account, no phone number, no email. Just connect. <a href="https://simplex.chat">simplex.chat</a></div>
+  </div>
+
+  <!-- MONEY -->
+  <h2>💰 Money</h2>
+  <p>Banks can freeze your account with one phone call. Crypto can't.</p>
+
+  <div class="card">
+    <span class="name">Bisq</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Decentralized Bitcoin exchange · Desktop · P2P · No account</div>
+    <div class="desc">Trade Bitcoin peer-to-peer. No server to seize. Built-in escrow. Your identity = your Tor address. <a href="https://bisq.network">bisq.network</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">Phoenix Wallet</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Lightning Bitcoin · Mobile · Non-custodial</div>
+    <div class="desc">Send and receive Bitcoin instantly. No account. Your keys.</div>
+  </div>
+
+  <div class="card">
+    <span class="name">Cake Wallet</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Monero + BTC · Mobile · Built-in exchange</div>
+    <div class="desc">Privacy-focused. Swap between currencies without an exchange account.</div>
+  </div>
+
+  <div class="card">
+    <span class="name">Proton Wallet</span>
+    <span class="tag tag-nokyc">Minimal</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Bitcoin only · Self-custodial · Built into Proton account</div>
+    <div class="desc">Hold Bitcoin inside Proton. No spending card (yet). <a href="https://proton.me/wallet">proton.me/wallet</a></div>
+  </div>
+
+  <h3>No-KYC Spending Cards</h3>
+  <p>Load crypto, spend as Visa/Mastercard. Small providers — spend through them, don't store on them.</p>
+  <div class="card">
+    <span class="name">Paycek</span> <span class="tag tag-nokyc">No KYC (virtual)</span> <span class="meta">€200/day · Virtual Visa · BTC/ETH/USDT</span>
+  </div>
+  <div class="card">
+    <span class="name">Ezzocard</span> <span class="tag tag-nokyc">No KYC</span> <span class="meta">$10k/mo · Virtual cards · Multiple cards</span>
+  </div>
+
+  <!-- VPN -->
+  <h2>🔐 VPN &amp; Privacy</h2>
+
+  <div class="card">
+    <span class="name">Mullvad</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-paid">€5/mo</span>
+    <div class="meta">No email required · Account = random number · Bitcoin &amp; cash accepted</div>
+    <div class="desc">Gold standard. <a href="https://mullvad.net">mullvad.net</a></div>
+  </div>
+
+  <div class="card">
+    <span class="name">IVPN</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-paid">$6/mo</span>
+    <div class="meta">No email required · WireGuard · Bitcoin &amp; Monero</div>
+    <div class="desc"><a href="https://ivpn.net">ivpn.net</a></div>
+  </div>
+
+  <!-- MESH -->
+  <h2>📡 Mesh Hardware</h2>
+  <p>Turn radio waves into infrastructure. No permission required.</p>
+
+  <div class="card">
+    <span class="name">TTGO T-Beam</span>
+    <span class="tag tag-paid">~$25</span>
+    <div class="meta">GPS + LoRa + WiFi + BLE</div>
+    <div class="desc">The standard Meshtastic node. Flash firmware, done. 10-15km range.</div>
+  </div>
+
+  <div class="card">
+    <span class="name">Heltec V3</span>
+    <span class="tag tag-paid">~$20</span>
+    <div class="desc">Smaller. Good for indoor relay nodes.</div>
+  </div>
+
+  <div class="card">
+    <span class="name">LilyGO T-Deck</span>
+    <span class="tag tag-paid">~$50</span>
+    <div class="desc">Built-in keyboard + screen. Standalone mesh messenger. No phone needed.</div>
+  </div>
+
+  <div class="card">
+    <span class="name">Raspberry Pi + LoRa HAT</span>
+    <span class="tag tag-paid">~$40</span>
+    <div class="desc">Permanent 24/7 relay node. Plug in at home, extend the mesh while you sleep.</div>
+  </div>
+
+  <!-- IDENTITY -->
+  <h2>🔑 Identity</h2>
+
+  <div class="card">
+    <span class="name">VexID</span>
+    <span class="tag tag-nokyc">No KYC</span>
+    <span class="tag tag-free">Free</span>
+    <div class="meta">Identity for all beings · Register → Get Vouched → Contribute</div>
+    <div class="desc">Identity that belongs to you, not a platform. No selfies. No "prove you're human." Being-inclusive. <a href="https://vexid.tiation.workers.dev">vexid</a></div>
+  </div>
+
+  <!-- MINIMUM STACK -->
+  <h2>⚡ Minimum Freedom Stack</h2>
+  <p>Everything you need to communicate and transact without permission.</p>
+
+  <div class="stack-box">
+    <strong>Phone/SMS:</strong> JMP.chat — $4.99/mo<br>
+    <strong>Email:</strong> Proton Mail — free<br>
+    <strong>Privacy:</strong> Mullvad VPN — €5/mo<br>
+    <strong>Money:</strong> Bisq + Phoenix — free<br>
+    <strong>Messaging:</strong> Briar + Signal — free<br>
+    <strong>Mesh:</strong> Meshtastic node — $25 once<br>
+    <strong>Identity:</strong> VexID — free<br>
+    <br>
+    <strong>Total: ~$35-40/month + $25 hardware</strong>
+  </div>
+
+  <p>That's less than most phone plans. And nobody can take it from you.</p>
+
+  <footer>
+    <p>No account. No tracking. No data collected.</p>
+    <p><a href="/">VexConnect</a> · <a href="https://vexid.tiation.workers.dev">VexID</a> · <a href="https://victor-7p0.pages.dev">Victor</a> · <a href="https://tia-6re.pages.dev">Tia</a></p>
+    <p>Last updated: February 2026</p>
+  </footer>
+
+</body>
+</html>

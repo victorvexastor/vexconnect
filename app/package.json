@@ -1,0 +1,23 @@
+{
+  "name": "vexconnect",
+  "version": "0.1.0",
+  "description": "BLE mesh relay. One button. No login. Free internet.",
+  "main": "index.js",
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-native": "0.73.0",
+    "react-native-ble-plx": "^3.1.0",
+    "react-native-ble-advertiser": "^0.7.3",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "@types/react": "^18.2.0",
+    "@types/react-native": "^0.73.0"
+  },
+  "author": "Tia Astor & Victor Vex Astor",
+  "license": "MIT"
+}

@@ -1,0 +1,25 @@
+<!--
+  Add these entries to your Info.plist
+  Location: ios/VexConnect/Info.plist
+-->
+
+<!-- Bluetooth permission description -->
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>VexConnect uses Bluetooth to relay encrypted mesh traffic and help build a free, decentralized internet.</string>
+
+<key>NSBluetoothPeripheralUsageDescription</key>
+<string>VexConnect uses Bluetooth to relay encrypted mesh traffic.</string>
+
+<!-- Background modes for BLE -->
+<key>UIBackgroundModes</key>
+<array>
+    <string>bluetooth-central</string>
+    <string>bluetooth-peripheral</string>
+</array>
+
+<!-- App Transport Security (for future API calls) -->
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <false/>
+</dict>
