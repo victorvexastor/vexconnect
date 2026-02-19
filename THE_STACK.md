@@ -177,6 +177,33 @@ One-time purchase. On the blockchain. No ICANN. No registrar. No expiry. No rene
 2. astor.x ($300) — the family
 3. vex.x ($600+) — the name
 
+### For Phone Numbers (Wholesale)
+
+| Provider | Cost/number | SMS cost | KYC | Notes |
+|----------|------------|----------|-----|-------|
+| **Telnyx** | $1.00/mo | $0.004/SMS | No business needed | API-first, crypto via Coinbase Commerce |
+| **VoIP.ms** | $0.85/mo | $0.01/SMS | No | PayPal accepted, privacy-friendly |
+| **Plivo** | $0.80/mo (US) | $0.04/SMS | No | |
+| **Twilio** | $1.50/mo (AU) | $0.05/SMS | No | Most docs/examples available |
+| **Vonage** | $1.00/mo (US) | $0.05/SMS | No | |
+| **BulkVS** | $0.25/mo (US) | $0.002/SMS | Needs reseller app | Cheapest if you qualify |
+
+**How virtual numbers work:**
+Someone texts your number → hits carrier → carrier forwards to provider's API → provider converts to email/XMPP/webhook → you read it on any device. No SIM. No roaming. No carrier on your end.
+
+**Bulk play:** 10+ numbers from Telnyx or VoIP.ms = $8-10/month total. Every node could have its own phone number.
+
+**Current status:**
+- ✅ Telnyx account live, API key works
+- ✅ Numbers available ($1/month with SMS)
+- ✅ Silent.link eSIM purchased ($9 data plan) — anonymous data for a mesh node
+- ⏳ Need $2 credit on Telnyx to buy the number
+- ⏳ Silent.link SMS numbers out of stock
+
+**Silent.link eSIM for mesh nodes:** Pop a no-KYC eSIM in a Pi with a USB modem → anonymous outdoor mesh node with 4G backhaul. No name, no ID, no address.
+
+**Free alternative:** Android/iPhone SMS-to-email forwarding apps. Uses your existing AU number. Zero cost.
+
 ### For Money
 
 | Service | What it does | Cost |
