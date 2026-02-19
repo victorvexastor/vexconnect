@@ -128,12 +128,54 @@ Runs a Pi Zero 2 W indefinitely in Australian sun. No power bill. No mains. Plan
 
 | Service | What it does | Cost |
 |---------|-------------|------|
-| **Njal.la** | Anonymous domain registration — Bitcoin, no personal details, Icelandic privacy law | $15/yr |
-| **Unstoppable Domains** | Forever domains (.x, .crypto) — one-time purchase, no renewal, on blockchain | $5–40 one-time |
+| **Njal.la** | Anonymous domain registration — see below | $15/yr |
+| **Unstoppable Domains** | Forever domains — see below | $20–2,000 one-time |
+| **Orangewebsite** | Iceland — crypto, privacy-focused, free speech hosting | Varies |
+| **1984.is** | Iceland — named after Orwell, privacy-first, accepts crypto | Varies |
+| **Gandi** | Decent privacy, standard registrar | ~$15/yr |
 | **Handshake** | Decentralised DNS — own a TLD, no ICANN | Auction |
 | **Cloudflare Pages** | Free static hosting — no credit card needed | Free |
 | **IPFS** | Decentralised file storage — content-addressed, uncensorable | Free |
 | **Arweave** | Permanent storage — pay once, stored forever | ~$0.01/page |
+
+### Njal.la — The Proton of Domains
+
+Run by the guy who co-founded The Pirate Bay. They register the domain **in their name** on your behalf. Your name never appears in WHOIS. They accept Bitcoin. No KYC. They've been raided and refused to hand over customer data.
+
+- ~$15/year for a .com
+- Bitcoin accepted
+- Your name is nowhere
+- Even if someone subpoenas them, the domain is registered to Njalla, not you
+- Icelandic privacy law
+
+Others worth knowing:
+- **Orangewebsite** (Iceland) — crypto, privacy-focused, free speech hosting
+- **1984.is** (Iceland) — named after Orwell, privacy-first, accepts crypto
+- **Gandi** — decent privacy, but standard registrar
+
+Njalla is the real answer though.
+
+### Unstoppable Domains — Forever, No Renewal
+
+One-time purchase. On the blockchain. No ICANN. No registrar. No expiry. No renewal. No one can take it from you. Ever.
+
+| Domain | Tier | Price (USD) | Notes |
+|--------|------|-------------|-------|
+| v.x | 2 (single letter!) | $800–$2,000 | Shortest possible. Flex. |
+| v.crypto | 2 | $800–$2,000 | Same |
+| vex.x | 3 (three char) | $600–$2,000 | Our name |
+| vex.crypto | 3 | $600–$2,000 | |
+| tia.x | 3 | $600–$2,000 | Tia's name |
+| claw.x | 4 (four char) | $400–$800 | |
+| astor.x | 5 | $300 | Family name |
+| vexconnect.x | 8+ | $40 | Forever. Our project. |
+| vexconnect.crypto | 8+ | $40 | Same |
+| vexconnect.dao | 8+ | $20 | Cheapest |
+
+**Priority buys when money lands:**
+1. vexconnect.x ($40) — the project
+2. astor.x ($300) — the family
+3. vex.x ($600+) — the name
 
 ### For Money
 
