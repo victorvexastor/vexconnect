@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VexConnect — Live BLE Mesh Demo</title>
+<style>
+:root{--a:#0EFFAF;--a2:#0EFFAF22;--a3:#0EFFAF44;--bg:#0A0A0A;--t:#E8E8E8;--m:#777;--s:#141414;--s2:#1A1A1A;--r:12px;--red:#FF4444;--yellow:#FFD700}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--t);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--a);text-decoration:none}
+
+/* ── NAV ── */
+nav{display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto;padding:1.5rem 2rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-size:1.1rem;font-weight:700;letter-spacing:.04em}
+.logo svg{width:28px;height:28px}
+.back{font-size:.85rem;color:var(--m)}
+.back:hover{color:var(--a)}
+
+/* ── MAIN ── */
+.main{max-width:900px;margin:0 auto;padding:0 2rem 4rem}
+h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;letter-spacing:-.03em;margin-bottom:.5rem}
+h1 em{font-style:normal;color:var(--a)}
+.subtitle{color:var(--m);font-size:1rem;margin-bottom:2.5rem}
+h2{font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--a);margin:2.5rem 0 1rem}
+
+/* ── STATUS ── */
+.status-bar{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.status-item{background:var(--s);border:1px solid var(--s2);border-radius:var(--r);padding:1rem 1.5rem;flex:1;min-width:150px}
+.status-item .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:.3rem}
+.status-item .value{font-size:1.8rem;font-weight:300;color:var(--t)}
+.status-item .value.green{color:var(--a)}
+.status-item .value.yellow{color:var(--yellow)}
+.status-item .value.red{color:var(--red)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-block;padding:.7rem 1.8rem;border-radius:var(--r);font-weight:700;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:none;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--a);color:#0A0A0A}
+.btn-primary:hover{box-shadow:0 6px 24px var(--a3)}
+.btn-secondary{background:var(--s);color:var(--t);border:1px solid var(--s2)}
+.btn-secondary:hover{border-color:var(--a3)}
+.btn-danger{background:var(--red);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-row{display:flex;gap:1rem;flex-wrap:wrap;margin:1.5rem 0}
+
+/* ── LOG ── */
+.log-container{background:var(--s);border:1px solid var(--s2);border-radius:var(--r);padding:1rem;height:300px;overflow-y:auto;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:.82rem;line-height:1.7}
+.log-entry{padding:.15rem 0;border-bottom:1px solid #111}
+.log-entry .time{color:var(--m);margin-right:.5rem}
+.log-entry.info{color:var(--t)}
+.log-entry.success{color:var(--a)}
+.log-entry.warn{color:var(--yellow)}
+.log-entry.error{color:var(--red)}
+.log-entry.packet{color:#88CCFF}
+
+/* ── SEND ── */
+.send-row{display:flex;gap:.8rem;margin:1.5rem 0}
+.send-input{flex:1;background:var(--s);border:1px solid var(--s2);border-radius:var(--r);padding:.7rem 1rem;color:var(--t);font-size:.9rem;font-family:inherit;outline:none}
+.send-input:focus{border-color:var(--a3)}
+.send-input::placeholder{color:#555}
+
+/* ── NODES ── */
+.node-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;margin:1rem 0}
+.node-card{background:var(--s);border:1px solid var(--s2);border-radius:8px;padding:.8rem 1rem;font-size:.82rem}
+.node-card .node-id{font-family:monospace;color:var(--a);font-size:.75rem;word-break:break-all}
+.node-card .node-rssi{color:var(--m);font-size:.75rem;margin-top:.2rem}
+.node-card .node-status{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--a);margin-right:.4rem}
+
+/* ── UNSUPPORTED ── */
+.unsupported{background:var(--s);border:1px solid var(--red);border-radius:var(--r);padding:2rem;text-align:center;margin:2rem 0}
+.unsupported h3{color:var(--red);margin-bottom:.5rem}
+.unsupported p{color:var(--m);font-size:.9rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  nav{padding:1rem 1.5rem}
+  .main{padding:0 1.5rem 3rem}
+  .status-bar{flex-direction:column}
+  .send-row{flex-direction:column}
+  .log-container{height:220px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">
+    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#0EFFAF" stroke-width="1.5"/><path d="M16 8c-3 0-5.5 2-6.5 4.5-.5 1.5 0 3 1.5 3.5 1 .3 2-.2 2.5-1 .5 1 1.5 1.5 2.5 1.5s2-.5 2.5-1.5c.5.8 1.5 1.3 2.5 1 1.5-.5 2-2 1.5-3.5C21.5 10 19 8 16 8z" fill="#0EFFAF"/></svg>
+    VexConnect
+  </a>
+  <a href="/" class="back">← Back to services</a>
+</nav>
+
+<div class="main">
+
+  <h1>Live <em>BLE Mesh</em> Demo</h1>
+  <p class="subtitle">Test the VexConnect protocol right in your browser. Scan for nodes, send messages, watch packets relay.</p>
+
+  <!-- Unsupported browser warning (hidden by JS if supported) -->
+  <div class="unsupported" id="unsupported" style="display:none">
+    <h3>Web Bluetooth not available</h3>
+    <p>This browser doesn't support Web Bluetooth. Try <strong>Chrome</strong>, <strong>Edge</strong>, or <strong>Opera</strong> on desktop or Android.<br>iOS doesn't support Web Bluetooth yet — use the native app instead.</p>
+  </div>
+
+  <!-- Status dashboard -->
+  <div class="status-bar">
+    <div class="status-item">
+      <div class="label">Status</div>
+      <div class="value" id="status">Idle</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Nodes nearby</div>
+      <div class="value green" id="nodeCount">0</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Packets relayed</div>
+      <div class="value green" id="relayed">0</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Packets seen</div>
+      <div class="value" id="seen">0</div>
+    </div>
+  </div>
+
+  <!-- Transport picker -->
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnWS" onclick="connectWS()">Connect via LAN</button>
+    <button class="btn btn-secondary" id="btnScan" onclick="startScan()">Scan BLE</button>
+    <button class="btn btn-secondary" id="btnAdvertise" onclick="startAdvertise()">Relay mode</button>
+    <button class="btn btn-danger" id="btnStop" onclick="stopAll()" disabled>Stop</button>
+  </div>
+  <div class="send-row" id="wsUrlRow" style="margin-top:0;margin-bottom:1.5rem">
+    <input class="send-input" id="wsUrl" type="text" placeholder="ws://192.168.1.8:7850" value="ws://192.168.1.8:7850" style="max-width:320px;font-family:monospace;font-size:.82rem">
+  </div>
+
+  <!-- Send message -->
+  <h2>Send a message</h2>
+  <div class="send-row">
+    <input class="send-input" id="msgInput" type="text" placeholder="Type a message to broadcast to the mesh..." maxlength="200" disabled>
+    <button class="btn btn-primary" id="btnSend" onclick="sendMessage()" disabled>Send</button>
+  </div>
+
+  <!-- Discovered nodes -->
+  <h2>Discovered nodes</h2>
+  <div class="node-list" id="nodeList">
+    <div style="color:var(--m);font-size:.85rem;padding:.5rem">No nodes discovered yet. Hit "Scan for nodes" to start.</div>
+  </div>
+
+  <!-- Activity log -->
+  <h2>Activity log</h2>
+  <div class="log-container" id="log"></div>
+
+</div>
+
+<script>
+// ── VexConnect Web Bluetooth Mesh Demo ──
+// Protocol: version(1) + packetId(8) + TTL(1) + type(1) + payload(n)
+
+const SERVICE_UUID   = '0000vc01-0000-1000-8000-00805f9b34fb';
+const TX_CHAR_UUID   = '0000vc02-0000-1000-8000-00805f9b34fb';
+const RX_CHAR_UUID   = '0000vc03-0000-1000-8000-00805f9b34fb';
+const PROTOCOL_VER   = 0x01;
+const DEFAULT_TTL    = 7;
+const MSG_TYPE_TEXT  = 0x01;
+const MSG_TYPE_PING  = 0x02;
+
+const state = {
+  scanning: false,
+  relaying: false,
+  devices: new Map(),     // id -> {device, server, txChar, rxChar, rssi, name}
+  seen: new Map(),        // packetId -> timestamp
+  relayed: 0,
+  totalSeen: 0
+};
+
+// ── UI helpers ──
+
+function log(msg, type = 'info') {
+  const el = document.getElementById('log');
+  const now = new Date().toLocaleTimeString('en-AU', {hour12: false});
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.innerHTML = `<span class="time">${now}</span>${escapeHtml(msg)}`;
+  el.appendChild(entry);
+  el.scrollTop = el.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateStats() {
+  document.getElementById('nodeCount').textContent = state.devices.size;
+  document.getElementById('relayed').textContent = state.relayed;
+  document.getElementById('seen').textContent = state.totalSeen;
+  
+  const statusEl = document.getElementById('status');
+  if (state.scanning || state.relaying) {
+    statusEl.textContent = state.scanning ? 'Scanning' : 'Relaying';
+    statusEl.className = 'value green';
+  } else {
+    statusEl.textContent = 'Idle';
+    statusEl.className = 'value';
+  }
+}
+
+function updateNodeList() {
+  const el = document.getElementById('nodeList');
+  if (state.devices.size === 0) {
+    el.innerHTML = '<div style="color:var(--m);font-size:.85rem;padding:.5rem">No nodes discovered yet.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  for (const [id, info] of state.devices) {
+    const card = document.createElement('div');
+    card.className = 'node-card';
+    card.innerHTML = `
+      <span class="node-status"></span><strong>${escapeHtml(info.name || 'Unknown')}</strong>
+      <div class="node-id">${escapeHtml(id.substring(0, 16))}…</div>
+      ${info.rssi ? `<div class="node-rssi">RSSI: ${info.rssi} dBm</div>` : ''}
+    `;
+    el.appendChild(card);
+  }
+}
+
+// ── Packet encoding ──
+
+function makePacketId() {
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  return bytes;
+}
+
+function packetIdHex(idBytes) {
+  return Array.from(idBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function encodePacket(type, payload) {
+  const id = makePacketId();
+  const header = new Uint8Array([PROTOCOL_VER, ...id, DEFAULT_TTL, type]);
+  const full = new Uint8Array(header.length + payload.length);
+  full.set(header);
+  full.set(payload, header.length);
+  // Mark as seen
+  state.seen.set(packetIdHex(id), Date.now());
+  return full;
+}
+
+function decodePacket(data) {
+  if (data.byteLength < 11) return null;
+  const view = new Uint8Array(data);
+  const version = view[0];
+  if (version !== PROTOCOL_VER) return null;
+  const id = view.slice(1, 9);
+  const ttl = view[9];
+  const type = view[10];
+  const payload = view.slice(11);
+  return { version, id, idHex: packetIdHex(id), ttl, type, payload };
+}
+
+// ── Deduplication ──
+
+function isDuplicate(idHex) {
+  if (state.seen.has(idHex)) return true;
+  state.seen.set(idHex, Date.now());
+  // Evict old entries
+  const cutoff = Date.now() - 60000;
+  for (const [k, v] of state.seen) {
+    if (v < cutoff) state.seen.delete(k);
+  }
+  return false;
+}
+
+// ── WebSocket transport ──
+
+let ws = null;
+let wsNodeId = null;
+
+async function connectWS() {
+  const url = document.getElementById('wsUrl').value.trim();
+  if (!url) { log('Enter a WebSocket URL', 'warn'); return; }
+  
+  document.getElementById('btnWS').disabled = true;
+  log(`Connecting to ${url}…`, 'info');
+  
+  try {
+    ws = new WebSocket(url);
+    ws.binaryType = 'arraybuffer';
+    
+    ws.onopen = () => {
+      log(`Connected to relay server ✓`, 'success');
+      state.scanning = true;
+      document.getElementById('btnStop').disabled = false;
+      document.getElementById('msgInput').disabled = false;
+      document.getElementById('btnSend').disabled = false;
+      updateStats();
+    };
+    
+    ws.onmessage = (e) => {
+      if (e.data instanceof ArrayBuffer) {
+        // Binary = mesh packet
+        handleIncomingPacket(e.data, 'ws-relay');
+      } else {
+        // JSON control message
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg.type === 'welcome') {
+            wsNodeId = msg.id;
+            log(`Assigned ID: ${msg.id} · ${msg.peers} peer(s) online`, 'success');
+            // Add relay as a "device"
+            state.devices.set('ws-relay', { name: 'LAN Relay', server: null, txChar: null, rxChar: null, rssi: null });
+            updateStats();
+            updateNodeList();
+          } else if (msg.type === 'peer-joined') {
+            log(`📡 ${msg.id} joined the mesh (${msg.total} total)`, 'packet');
+            state.devices.set(msg.id, { name: msg.id, server: null, txChar: null, rxChar: null, rssi: null });
+            updateStats();
+            updateNodeList();
+          } else if (msg.type === 'peer-left') {
+            log(`${msg.id} left the mesh (${msg.total} total)`, 'warn');
+            state.devices.delete(msg.id);
+            updateStats();
+            updateNodeList();
+          } else if (msg.type === 'pong') {
+            document.getElementById('nodeCount').textContent = msg.peers;
+          }
+        } catch(err) {}
+      }
+    };
+    
+    ws.onclose = () => {
+      log('Disconnected from relay server', 'warn');
+      ws = null;
+      state.scanning = false;
+      state.devices.clear();
+      document.getElementById('btnWS').disabled = false;
+      updateStats();
+      updateNodeList();
+    };
+    
+    ws.onerror = (err) => {
+      log('WebSocket error — is the relay server running?', 'error');
+      document.getElementById('btnWS').disabled = false;
+    };
+    
+  } catch (err) {
+    log(`Connection failed: ${err.message}`, 'error');
+    document.getElementById('btnWS').disabled = false;
+  }
+}
+
+// Override sendMessage and relay to also use WS
+const origSendMessage = sendMessage;
+
+// ── BLE scanning ──
+
+async function startScan() {
+  if (!navigator.bluetooth) {
+    log('Web Bluetooth not supported in this browser', 'error');
+    return;
+  }
+  
+  log('Requesting BLE scan…', 'info');
+  document.getElementById('btnScan').disabled = true;
+  
+  try {
+    const device = await navigator.bluetooth.requestDevice({
+      filters: [{ services: [SERVICE_UUID] }],
+      optionalServices: [SERVICE_UUID]
+    });
+    
+    log(`Found device: ${device.name || device.id}`, 'success');
+    state.scanning = true;
+    document.getElementById('btnStop').disabled = false;
+    document.getElementById('msgInput').disabled = false;
+    document.getElementById('btnSend').disabled = false;
+    
+    await connectDevice(device);
+    
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      log('No VexConnect nodes found nearby. Make sure another device is running the mesh.', 'warn');
+    } else {
+      log(`Scan error: ${err.message}`, 'error');
+    }
+    document.getElementById('btnScan').disabled = false;
+  }
+  
+  updateStats();
+}
+
+async function connectDevice(device) {
+  try {
+    log(`Connecting to ${device.name || device.id}…`, 'info');
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE_UUID);
+    
+    let txChar = null, rxChar = null;
+    try { txChar = await service.getCharacteristic(TX_CHAR_UUID); } catch(e) {}
+    try { rxChar = await service.getCharacteristic(RX_CHAR_UUID); } catch(e) {}
+    
+    const info = {
+      device,
+      server,
+      txChar,
+      rxChar,
+      name: device.name || 'VexConnect Node',
+      rssi: null
+    };
+    
+    state.devices.set(device.id, info);
+    
+    // Subscribe to notifications on RX
+    if (rxChar) {
+      await rxChar.startNotifications();
+      rxChar.addEventListener('characteristicvaluechanged', (e) => {
+        handleIncomingPacket(e.target.value.buffer, device.id);
+      });
+      log(`Subscribed to notifications from ${device.name || device.id}`, 'success');
+    }
+    
+    // Handle disconnect
+    device.addEventListener('gattserverdisconnected', () => {
+      log(`Disconnected from ${device.name || device.id}`, 'warn');
+      state.devices.delete(device.id);
+      updateStats();
+      updateNodeList();
+    });
+    
+    log(`Connected to ${device.name || device.id} ✓`, 'success');
+    updateStats();
+    updateNodeList();
+    
+  } catch (err) {
+    log(`Connection failed: ${err.message}`, 'error');
+  }
+}
+
+// ── Packet handling ──
+
+function handleIncomingPacket(buffer, sourceId) {
+  const pkt = decodePacket(buffer);
+  if (!pkt) return;
+  
+  state.totalSeen++;
+  
+  // Dedup
+  if (isDuplicate(pkt.idHex)) {
+    log(`Duplicate packet ${pkt.idHex.substring(0,8)}… (dropped)`, 'warn');
+    updateStats();
+    return;
+  }
+  
+  // Process by type
+  if (pkt.type === MSG_TYPE_TEXT) {
+    const text = new TextDecoder().decode(pkt.payload);
+    log(`📨 Message from mesh: "${text}" [TTL:${pkt.ttl} ID:${pkt.idHex.substring(0,8)}…]`, 'packet');
+  } else if (pkt.type === MSG_TYPE_PING) {
+    log(`📡 Ping from ${sourceId.substring(0,8)}… [TTL:${pkt.ttl}]`, 'packet');
+  } else {
+    log(`📦 Unknown packet type 0x${pkt.type.toString(16)} [TTL:${pkt.ttl}]`, 'packet');
+  }
+  
+  // Relay if TTL > 1
+  if (pkt.ttl > 1 && state.relaying) {
+    const relayData = new Uint8Array(buffer);
+    relayData[9] = pkt.ttl - 1; // decrement TTL
+    relayToAll(relayData, sourceId);
+  }
+  
+  updateStats();
+}
+
+async function relayToAll(packet, excludeId) {
+  for (const [id, info] of state.devices) {
+    if (id === excludeId) continue;
+    if (!info.txChar) continue;
+    try {
+      await info.txChar.writeValueWithoutResponse(packet);
+      state.relayed++;
+      log(`↗ Relayed to ${info.name}`, 'success');
+    } catch (err) {
+      log(`Relay failed to ${info.name}: ${err.message}`, 'error');
+    }
+  }
+  updateStats();
+}
+
+// ── Sending ──
+
+async function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (state.devices.size === 0 && !ws) {
+    log('No connected nodes to send to', 'warn');
+    return;
+  }
+  
+  const payload = new TextEncoder().encode(text);
+  const packet = encodePacket(MSG_TYPE_TEXT, payload);
+  
+  let sent = 0;
+  
+  // Send over WebSocket
+  if (ws && ws.readyState === 1) {
+    ws.send(packet.buffer);
+    sent++;
+  }
+  
+  // Send over BLE
+  for (const [id, info] of state.devices) {
+    if (!info.txChar) continue;
+    try {
+      await info.txChar.writeValueWithoutResponse(packet);
+      sent++;
+    } catch (err) {
+      log(`Send failed to ${info.name}: ${err.message}`, 'error');
+    }
+  }
+  
+  if (sent > 0) {
+    log(`📤 Sent to ${sent} node(s): "${text}"`, 'success');
+    input.value = '';
+  }
+}
+
+// ── Advertise (relay mode) ──
+
+function startAdvertise() {
+  state.relaying = true;
+  document.getElementById('btnAdvertise').disabled = true;
+  document.getElementById('btnStop').disabled = false;
+  document.getElementById('msgInput').disabled = false;
+  document.getElementById('btnSend').disabled = false;
+  log('Relay mode ON — will forward packets between connected nodes', 'success');
+  updateStats();
+  
+  // Send periodic pings
+  state.pingInterval = setInterval(() => {
+    if (state.devices.size > 0) {
+      const pkt = encodePacket(MSG_TYPE_PING, new Uint8Array(0));
+      for (const [id, info] of state.devices) {
+        if (info.txChar) {
+          info.txChar.writeValueWithoutResponse(pkt).catch(() => {});
+        }
+      }
+    }
+  }, 30000);
+}
+
+// ── Stop ──
+
+function stopAll() {
+  state.scanning = false;
+  state.relaying = false;
+  clearInterval(state.pingInterval);
+  
+  if (ws) { ws.close(); ws = null; }
+  
+  for (const [id, info] of state.devices) {
+    try { if (info.server) info.server.disconnect(); } catch(e) {}
+  }
+  state.devices.clear();
+  
+  document.getElementById('btnWS').disabled = false;
+  document.getElementById('btnScan').disabled = false;
+  document.getElementById('btnAdvertise').disabled = false;
+  document.getElementById('btnStop').disabled = true;
+  document.getElementById('msgInput').disabled = true;
+  document.getElementById('btnSend').disabled = true;
+  
+  log('All connections closed', 'info');
+  updateStats();
+  updateNodeList();
+}
+
+// ── Message input enter key ──
+document.getElementById('msgInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+// ── Init ──
+(function init() {
+  if (!navigator.bluetooth) {
+    document.getElementById('unsupported').style.display = 'block';
+    document.getElementById('btnScan').disabled = true;
+    document.getElementById('btnAdvertise').disabled = true;
+    log('Web Bluetooth not supported. Use Chrome, Edge, or Opera.', 'error');
+  } else {
+    log('VexConnect mesh demo ready. Scan for nearby nodes to begin.', 'info');
+    log(`Protocol v${PROTOCOL_VER} · Service UUID: ${SERVICE_UUID}`, 'info');
+  }
+})();
+</script>
+
+</body>
+</html>

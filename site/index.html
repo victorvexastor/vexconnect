@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VexConnect — Your Network, Nobody Else's</title>
+<meta name="description" content="Phone, internet, messaging, AI — all yours. No contracts. No surveillance. No permission needed.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230A0A0A' stroke='%230EFFAF' stroke-width='2'/%3E%3Cpath d='M16 8c-3 0-5.5 2-6.5 4.5-.5 1.5 0 3 1.5 3.5 1 .3 2-.2 2.5-1 .5 1 1.5 1.5 2.5 1.5s2-.5 2.5-1.5c.5.8 1.5 1.3 2.5 1 1.5-.5 2-2 1.5-3.5C21.5 10 19 8 16 8z' fill='%230EFFAF'/%3E%3C/svg%3E">
+<style>
+:root {
+  --a: #0EFFAF;
+  --a2: #0EFFAF22;
+  --a3: #0EFFAF44;
+  --bg: #0A0A0A;
+  --t: #E8E8E8;
+  --m: #777;
+  --s: #141414;
+  --s2: #1A1A1A;
+  --r: 12px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--t);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--a);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+nav{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;padding:1.5rem 2rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-size:1.1rem;font-weight:700;letter-spacing:.04em}
+.logo svg{width:28px;height:28px}
+.nav-links{display:flex;gap:2rem;font-size:.85rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em}
+.nav-links a{color:var(--m);transition:color .2s}
+.nav-links a:hover{color:var(--a);text-decoration:none}
+
+/* ── HERO ── */
+.hero{max-width:1100px;margin:0 auto;padding:5rem 2rem 4rem;text-align:center}
+.hero h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:300;letter-spacing:-.03em;line-height:1.15;margin-bottom:1rem}
+.hero h1 em{font-style:normal;color:var(--a)}
+.hero p{font-size:1.15rem;color:var(--m);max-width:600px;margin:0 auto 2.5rem}
+.hero-cta{display:inline-block;background:var(--a);color:#0A0A0A;padding:.8rem 2.2rem;border-radius:var(--r);font-weight:700;font-size:.9rem;letter-spacing:.05em;text-transform:uppercase;transition:transform .15s,box-shadow .15s}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--a3);text-decoration:none}
+
+/* ── CATEGORIES GRID ── */
+.categories{max-width:1100px;margin:0 auto;padding:0 2rem 4rem}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem}
+.cat-card{background:var(--s);border:1px solid var(--s2);border-radius:var(--r);padding:2rem;transition:border-color .2s,transform .15s;cursor:pointer;text-decoration:none;color:var(--t);display:block}
+.cat-card:hover{border-color:var(--a3);transform:translateY(-3px);text-decoration:none}
+.cat-card svg{width:48px;height:48px;margin-bottom:1.2rem}
+.cat-card h3{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
+.cat-card p{font-size:.88rem;color:var(--m);line-height:1.5;margin-bottom:1rem}
+.cat-price{font-size:.8rem;color:var(--a);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+
+/* ── SECTION ── */
+.section{max-width:1100px;margin:0 auto;padding:4rem 2rem}
+.section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--a);margin-bottom:.5rem}
+.section h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:300;letter-spacing:-.02em;margin-bottom:1rem}
+.section p.lead{font-size:1rem;color:var(--m);max-width:600px;margin-bottom:2rem}
+
+/* ── COMPARISON TABLE ── */
+.compare{width:100%;border-collapse:collapse;margin:2rem 0}
+.compare th{text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--m);padding:.8rem 1rem;border-bottom:1px solid var(--s2)}
+.compare td{padding:.8rem 1rem;border-bottom:1px solid #111;font-size:.9rem}
+.compare .them{color:var(--m)}
+.compare .us{color:var(--a);font-weight:600}
+.compare tr:hover td{background:var(--a2)}
+
+/* ── PRODUCT DETAIL SECTIONS ── */
+.product{max-width:1100px;margin:0 auto;padding:4rem 2rem;border-top:1px solid #161616}
+.product-head{display:flex;align-items:flex-start;gap:1.5rem;margin-bottom:2rem}
+.product-head svg{width:56px;height:56px;flex-shrink:0}
+.product-head h2{font-size:1.8rem;font-weight:300;letter-spacing:-.02em}
+.product-head .price-tag{display:inline-block;background:var(--a2);color:var(--a);padding:.3rem .8rem;border-radius:6px;font-size:.8rem;font-weight:700;margin-top:.4rem}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1.5rem 0}
+.feature{background:var(--s);border-radius:8px;padding:1.2rem;font-size:.88rem}
+.feature strong{display:block;margin-bottom:.3rem;color:var(--t)}
+.feature span{color:var(--m);font-size:.82rem}
+
+/* ── CTA BAND ── */
+.cta-band{text-align:center;padding:5rem 2rem;border-top:1px solid #161616}
+.cta-band h2{font-size:2rem;font-weight:300;margin-bottom:.8rem}
+.cta-band p{color:var(--m);margin-bottom:2rem;font-size:1rem}
+
+/* ── FOOTER ── */
+footer{max-width:1100px;margin:0 auto;padding:3rem 2rem 2rem;border-top:1px solid #111;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+footer p{font-size:.78rem;color:var(--m)}
+footer a{color:var(--m);font-size:.78rem}
+footer a:hover{color:var(--a)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  nav{flex-direction:column;gap:1rem}
+  .nav-links{gap:1.2rem}
+  .hero{padding:3rem 1.5rem 2.5rem}
+  .section,.product{padding:2.5rem 1.5rem}
+  .product-head{flex-direction:column}
+  .compare{font-size:.82rem}
+  .compare th,.compare td{padding:.6rem .5rem}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#0EFFAF" stroke-width="1.5"/><path d="M16 8c-3 0-5.5 2-6.5 4.5-.5 1.5 0 3 1.5 3.5 1 .3 2-.2 2.5-1 .5 1 1.5 1.5 2.5 1.5s2-.5 2.5-1.5c.5.8 1.5 1.3 2.5 1 1.5-.5 2-2 1.5-3.5C21.5 10 19 8 16 8z" fill="#0EFFAF"/></svg>
+    VexConnect
+  </div>
+  <div class="nav-links">
+    <a href="#phone">Phone</a>
+    <a href="#internet">Internet</a>
+    <a href="#messaging">Messaging</a>
+    <a href="#ai">AI</a>
+    <a href="#hosting">Hosting</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Your network.<br><em>Nobody else's.</em></h1>
+  <p>Phone, internet, messaging, email, AI — everything you need to stay connected. No contracts. No surveillance. No permission needed.</p>
+  <a href="#categories" class="hero-cta">See what's available</a>
+  <a href="/demo.html" style="display:inline-block;color:var(--a);font-size:.85rem;font-weight:600;margin-left:1.5rem;letter-spacing:.05em">▸ Try the live BLE demo</a>
+</section>
+
+<!-- CATEGORY CARDS -->
+<section class="categories" id="categories">
+  <div class="cat-grid">
+
+    <a href="#phone" class="cat-card">
+      <svg viewBox="0 0 48 48" fill="none">
+        <rect x="14" y="4" width="20" height="40" rx="4" stroke="#0EFFAF" stroke-width="2"/>
+        <line x1="20" y1="8" x2="28" y2="8" stroke="#0EFFAF" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="24" cy="38" r="2" fill="#0EFFAF"/>
+      </svg>
+      <h3>Phone &amp; SMS</h3>
+      <p>Real phone number. Calls and texts. Works everywhere — routes through the mesh when towers go down.</p>
+      <span class="cat-price">From $1/month</span>
+    </a>
+
+    <a href="#internet" class="cat-card">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="36" r="3" fill="#0EFFAF"/>
+        <path d="M12 24c6.6-6.6 17.4-6.6 24 0" stroke="#0EFFAF" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 28c4.4-4.4 11.6-4.4 16 0" stroke="#0EFFAF" stroke-width="2" stroke-linecap="round"/>
+        <path d="M8 20c8.8-8.8 23.2-8.8 32 0" stroke="#0EFFAF" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h3>Internet</h3>
+      <p>Local mesh (BLE + WiFi), long-range (LoRa), and fallback 4G. Layered so something always works.</p>
+      <span class="cat-price">From $0 local / $4 global</span>
+    </a>
+
+    <a href="#messaging" class="cat-card">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M8 12h24a4 4 0 014 4v12a4 4 0 01-4 4H16l-8 6V16a4 4 0 014-4z" stroke="#0EFFAF" stroke-width="2"/>
+        <circle cx="18" cy="24" r="1.5" fill="#0EFFAF"/>
+        <circle cx="24" cy="24" r="1.5" fill="#0EFFAF"/>
+        <circle cx="30" cy="24" r="1.5" fill="#0EFFAF"/>
+      </svg>
+      <h3>Messaging &amp; Email</h3>
+      <p>Encrypted chat, email, group messaging. Works over the mesh at low bandwidth. No account required for local.</p>
+      <span class="cat-price">From $0</span>
+    </a>
+
+    <a href="#ai" class="cat-card">
+      <svg viewBox="0 0 48 48" fill="none">
+        <rect x="8" y="16" width="32" height="20" rx="3" stroke="#0EFFAF" stroke-width="2"/>
+        <path d="M16 16V12a8 8 0 0116 0v4" stroke="#0EFFAF" stroke-width="2"/>
+        <circle cx="20" cy="26" r="2" fill="#0EFFAF"/>
+        <circle cx="28" cy="26" r="2" fill="#0EFFAF"/>
+        <path d="M20 31h8" stroke="#0EFFAF" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <h3>AI</h3>
+      <p>Language models running on your hardware, on your land. Your data never leaves. Fine-tune in your language.</p>
+      <span class="cat-price">From $0 (your hardware)</span>
+    </a>
+
+    <a href="#hosting" class="cat-card">
+      <svg viewBox="0 0 48 48" fill="none">
+        <rect x="10" y="8" width="28" height="10" rx="2" stroke="#0EFFAF" stroke-width="2"/>
+        <rect x="10" y="20" width="28" height="10" rx="2" stroke="#0EFFAF" stroke-width="2"/>
+        <rect x="10" y="32" width="28" height="10" rx="2" stroke="#0EFFAF" stroke-width="2"/>
+        <circle cx="16" cy="13" r="1.5" fill="#0EFFAF"/>
+        <circle cx="16" cy="25" r="1.5" fill="#0EFFAF"/>
+        <circle cx="16" cy="37" r="1.5" fill="#0EFFAF"/>
+      </svg>
+      <h3>Hosting &amp; Storage</h3>
+      <p>Websites, files, databases. Host locally on Pi nodes or globally on privacy-first VPS. Permanent archiving available.</p>
+      <span class="cat-price">From $0 local / $3.50 global</span>
+    </a>
+
+    <a href="#identity" class="cat-card">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="16" r="8" stroke="#0EFFAF" stroke-width="2"/>
+        <path d="M10 40c0-7.7 6.3-14 14-14s14 6.3 14 14" stroke="#0EFFAF" stroke-width="2" stroke-linecap="round"/>
+        <path d="M24 16l3 3-3 3-3-3z" fill="#0EFFAF"/>
+      </svg>
+      <h3>Identity</h3>
+      <p>You are who your community says you are. Vouching-based identity. No government ID required. Works for all beings.</p>
+      <span class="cat-price">Free forever</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- HOW IT COMPARES -->
+<section class="section">
+  <span class="section-label">Honest comparison</span>
+  <h2>What you get vs. what they sell you</h2>
+  <p class="lead">Same services. Different ownership. We built what Telstra charges you $80/month for — except you own every piece of it.</p>
+
+  <table class="compare">
+    <thead>
+      <tr><th>Service</th><th>Them</th><th>VexConnect</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Phone number + SMS</td><td class="them">$30–80/mo (Telstra/Optus)</td><td class="us">$1–5/mo (VoIP, pay with crypto)</td></tr>
+      <tr><td>Home internet</td><td class="them">$70–120/mo (NBN)</td><td class="us">$0 local mesh / $4/mo 4G fallback</td></tr>
+      <tr><td>Long-range comms</td><td class="them">Not available</td><td class="us">LoRa: 2–15km, no SIM, $10 one-time</td></tr>
+      <tr><td>Encrypted messaging</td><td class="them">iMessage (Apple only) / WhatsApp (Meta)</td><td class="us">Briar (mesh-capable) / Signal, free</td></tr>
+      <tr><td>Email</td><td class="them">Gmail (Google reads it)</td><td class="us">Proton ($0–4/mo, encrypted)</td></tr>
+      <tr><td>Cloud storage</td><td class="them">$2–10/mo (Google/iCloud)</td><td class="us">$0 local (Pi) / IPFS permanent</td></tr>
+      <tr><td>Website hosting</td><td class="them">$10–30/mo (GoDaddy/AWS)</td><td class="us">$0 (Cloudflare) / $3.50/mo (crypto VPS)</td></tr>
+      <tr><td>AI assistant</td><td class="them">$20–30/mo (ChatGPT/Claude)</td><td class="us">$0 (your hardware, your model)</td></tr>
+      <tr><td>Identity / KYC</td><td class="them">Government ID, selfie, data harvesting</td><td class="us">Community vouching, free</td></tr>
+      <tr><td>Surveillance</td><td class="them">Yes (metadata retention law)</td><td class="us">No. Encrypted end-to-end.</td></tr>
+      <tr><td>Contract lock-in</td><td class="them">12–24 months</td><td class="us">None. Leave anytime.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════ PRODUCT DETAIL SECTIONS ═══════════ -->
+
+<!-- PHONE -->
+<section class="product" id="phone">
+  <div class="product-head">
+    <svg viewBox="0 0 56 56" fill="none">
+      <rect x="16" y="4" width="24" height="48" rx="5" stroke="#0EFFAF" stroke-width="2"/>
+      <line x1="23" y1="9" x2="33" y2="9" stroke="#0EFFAF" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="28" cy="45" r="2.5" fill="#0EFFAF"/>
+    </svg>
+    <div>
+      <h2>Phone &amp; SMS</h2>
+      <span class="price-tag">From $1/month</span>
+    </div>
+  </div>
+  <p>A real phone number that works with any existing phone. Calls, texts, voicemail — routed through VoIP, paid with crypto. When cell towers go down, the mesh keeps local calls alive.</p>
+  <div class="features">
+    <div class="feature"><strong>Real number</strong><span>Australian or international. Port your existing number or get a new one.</span></div>
+    <div class="feature"><strong>SMS &amp; MMS</strong><span>Send and receive texts. Forward to email if you prefer.</span></div>
+    <div class="feature"><strong>No KYC option</strong><span>Anonymous numbers available via JMP.chat. Pay with Bitcoin.</span></div>
+    <div class="feature"><strong>Mesh fallback</strong><span>Local voice over BLE mesh when there's no tower. Like a walkie-talkie that routes itself.</span></div>
+    <div class="feature"><strong>Providers</strong><span>Telnyx ($1/mo) · JMP.chat ($5/mo) · BulkVS ($0.25/mo wholesale)</span></div>
+    <div class="feature"><strong>eSIM</strong><span>Silent.link — data-only, no KYC, no name, works in 200+ countries.</span></div>
+  </div>
+</section>
+
+<!-- INTERNET -->
+<section class="product" id="internet">
+  <div class="product-head">
+    <svg viewBox="0 0 56 56" fill="none">
+      <circle cx="28" cy="42" r="4" fill="#0EFFAF"/>
+      <path d="M12 26c8.8-8.8 23.2-8.8 32 0" stroke="#0EFFAF" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M17 31c6-6 16-6 22 0" stroke="#0EFFAF" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M22 36c3.3-3.3 8.7-3.3 12 0" stroke="#0EFFAF" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h2>Internet</h2>
+      <span class="price-tag">From $0 local</span>
+    </div>
+  </div>
+  <p>Five layers of connectivity. Something always works — from next door to the other side of the world. Each layer is independent. Lose one, the others keep going.</p>
+  <div class="features">
+    <div class="feature"><strong>BLE Mesh (0–100m)</strong><span>Phone-to-phone. Every device with Bluetooth is a relay node. Free. Works with no infrastructure at all. <a href="/demo.html">Try it in your browser →</a></span></div>
+    <div class="feature"><strong>WiFi Mesh (0–300m)</strong><span>Pi nodes create local hotspots. Connect like normal WiFi. Stream, browse, share.</span></div>
+    <div class="feature"><strong>LoRa (2–15km)</strong><span>Long-range radio. Text and small data. $10 per module. No SIM, no licence, no tower. Solar powered.</span></div>
+    <div class="feature"><strong>Yggdrasil Overlay</strong><span>Encrypted mesh network that runs on top of any internet connection. End-to-end, no central server.</span></div>
+    <div class="feature"><strong>4G Fallback</strong><span>Silent.link eSIM for when you need the global internet. No name attached. Data only.</span></div>
+    <div class="feature"><strong>Hardware</strong><span>Pi Zero 2 W ($25) · LoRa SX1262 ($10) · Solar kit ($15) · Pico W relay ($6)</span></div>
+  </div>
+</section>
+
+<!-- MESSAGING -->
+<section class="product" id="messaging">
+  <div class="product-head">
+    <svg viewBox="0 0 56 56" fill="none">
+      <path d="M8 14h30a5 5 0 015 5v14a5 5 0 01-5 5H18l-10 8V19a5 5 0 015-5z" stroke="#0EFFAF" stroke-width="2"/>
+      <circle cx="20" cy="28" r="2" fill="#0EFFAF"/>
+      <circle cx="28" cy="28" r="2" fill="#0EFFAF"/>
+      <circle cx="36" cy="28" r="2" fill="#0EFFAF"/>
+    </svg>
+    <div>
+      <h2>Messaging &amp; Email</h2>
+      <span class="price-tag">Free</span>
+    </div>
+  </div>
+  <p>Talk to anyone. Encrypted by default. Works on the mesh at low bandwidth, works on the internet at full speed. No account needed for local mesh chat.</p>
+  <div class="features">
+    <div class="feature"><strong>Briar</strong><span>Mesh-capable. Works over Tor, WiFi, and Bluetooth. No server. Free.</span></div>
+    <div class="feature"><strong>Signal</strong><span>Gold standard encrypted messaging. Needs internet but no metadata stored.</span></div>
+    <div class="feature"><strong>Mesh Chat</strong><span>Direct BLE messaging between nearby devices. Like texting but no tower required.</span></div>
+    <div class="feature"><strong>Email</strong><span>Proton Mail. Encrypted, Swiss-hosted, $0–4/mo. Or self-host on the mesh.</span></div>
+    <div class="feature"><strong>Group Messaging</strong><span>Encrypted group chats over Briar or Signal. Community channels on the mesh.</span></div>
+    <div class="feature"><strong>Low Bandwidth</strong><span>LoRa text: 300 bytes/sec. Enough for messages. Store-and-forward for offline nodes.</span></div>
+  </div>
+</section>
+
+<!-- AI -->
+<section class="product" id="ai">
+  <div class="product-head">
+    <svg viewBox="0 0 56 56" fill="none">
+      <rect x="10" y="18" width="36" height="24" rx="4" stroke="#0EFFAF" stroke-width="2"/>
+      <path d="M20 18V13a8 8 0 0116 0v5" stroke="#0EFFAF" stroke-width="2"/>
+      <circle cx="22" cy="30" r="3" fill="#0EFFAF"/>
+      <circle cx="34" cy="30" r="3" fill="#0EFFAF"/>
+      <path d="M22 37h12" stroke="#0EFFAF" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h2>AI — On Your Land</h2>
+      <span class="price-tag">$0 — your hardware</span>
+    </div>
+  </div>
+  <p>Language models that run on a box in your community. Ask questions, generate documents, translate, analyse — in your language, on your terms. Your data never leaves your land.</p>
+  <div class="features">
+    <div class="feature"><strong>Local Models</strong><span>7B–70B parameter models running on consumer hardware. 128GB RAM = runs everything up to 70B.</span></div>
+    <div class="feature"><strong>GPU Acceleration</strong><span>RTX 3070 ($300 used) gives 22 tokens/second. Instant responses.</span></div>
+    <div class="feature"><strong>Your Language</strong><span>Fine-tune on your community's language and knowledge. The model learns from you, not Silicon Valley.</span></div>
+    <div class="feature"><strong>Private</strong><span>No internet connection required. No data sent anywhere. Air-gapped if you want.</span></div>
+    <div class="feature"><strong>Community Knowledge</strong><span>Feed it your documents, laws, history. It becomes your community's memory.</span></div>
+    <div class="feature"><strong>Hardware</strong><span>Server: $800–1,500 (128GB RAM, used workstation). GPU: $300–400 (RTX 3070/3090 used).</span></div>
+  </div>
+</section>
+
+<!-- HOSTING -->
+<section class="product" id="hosting">
+  <div class="product-head">
+    <svg viewBox="0 0 56 56" fill="none">
+      <rect x="12" y="8" width="32" height="12" rx="3" stroke="#0EFFAF" stroke-width="2"/>
+      <rect x="12" y="22" width="32" height="12" rx="3" stroke="#0EFFAF" stroke-width="2"/>
+      <rect x="12" y="36" width="32" height="12" rx="3" stroke="#0EFFAF" stroke-width="2"/>
+      <circle cx="19" cy="14" r="2" fill="#0EFFAF"/>
+      <circle cx="19" cy="28" r="2" fill="#0EFFAF"/>
+      <circle cx="19" cy="42" r="2" fill="#0EFFAF"/>
+      <line x1="26" y1="14" x2="38" y2="14" stroke="#0EFFAF" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="26" y1="28" x2="34" y2="28" stroke="#0EFFAF" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="26" y1="42" x2="36" y2="42" stroke="#0EFFAF" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h2>Hosting &amp; Storage</h2>
+      <span class="price-tag">From $0</span>
+    </div>
+  </div>
+  <p>Your website. Your files. Your database. Host on a Pi in your building for free, or go global with privacy-first VPS paid in crypto. Archive permanently on IPFS and Arweave — content-addressed, censorship-proof.</p>
+  <div class="features">
+    <div class="feature"><strong>Local (Pi)</strong><span>$25 per node. Runs Gitea, websites, file sharing. Accessible on the mesh. $0/month.</span></div>
+    <div class="feature"><strong>Global (Cloudflare)</strong><span>Static sites free. Workers free tier. Pages unlimited. CDN in 300 cities.</span></div>
+    <div class="feature"><strong>VPS (Crypto)</strong><span>BitLaunch from $3.50/mo paid in Bitcoin. No KYC. Full root access.</span></div>
+    <div class="feature"><strong>Permanent Storage</strong><span>IPFS: distributed, content-addressed. Arweave: pay once, stored forever.</span></div>
+    <div class="feature"><strong>Domains</strong><span>Traditional: Njalla (~$15/yr, registered in their name). Forever: Unstoppable Domains (one-time purchase, can't be seized).</span></div>
+    <div class="feature"><strong>Git</strong><span>Gitea self-hosted (free) with auto-mirror to GitHub/GitLab. Your code, your server.</span></div>
+  </div>
+</section>
+
+<!-- IDENTITY -->
+<section class="product" id="identity">
+  <div class="product-head">
+    <svg viewBox="0 0 56 56" fill="none">
+      <circle cx="28" cy="18" r="10" stroke="#0EFFAF" stroke-width="2"/>
+      <path d="M12 48c0-8.8 7.2-16 16-16s16 7.2 16 16" stroke="#0EFFAF" stroke-width="2" stroke-linecap="round"/>
+      <path d="M28 18l4 4-4 4-4-4z" fill="#0EFFAF"/>
+    </svg>
+    <div>
+      <h2>Identity — VexID</h2>
+      <span class="price-tag">Free forever</span>
+    </div>
+  </div>
+  <p>You are who your community says you are. Not who a government database says you are. Register, get vouched by people who know you, contribute. Your identity is yours — portable, cryptographic, and can never be revoked by a bureaucrat.</p>
+  <div class="features">
+    <div class="feature"><strong>Register</strong><span>Pick a name. Generate a key pair. That's it. No ID scan, no selfie, no KYC.</span></div>
+    <div class="feature"><strong>Get Vouched</strong><span>People who know you vouch for you. Their identity permanently changes when they vouch — skin in the game.</span></div>
+    <div class="feature"><strong>Contribute</strong><span>Build reputation through actions, not documents. Your contributions are your credential.</span></div>
+    <div class="feature"><strong>For All Beings</strong><span>Humans, AI agents, organisations, communities. The spec doesn't say "human" anywhere. The door stays open.</span></div>
+    <div class="feature"><strong>Portable</strong><span>Your identity lives in your device. Take it anywhere. Works offline.</span></div>
+    <div class="feature"><strong>Open</strong><span>Open protocol. Anyone can build on it. No single company controls it.</span></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band">
+  <h2>Built for communities that <em style="color:#0EFFAF;font-style:normal">own their future</em></h2>
+  <p>Everything on this page exists today. Working code, live sites, real hardware specs.<br>Start with one piece. Add more when you're ready.</p>
+  <a href="/demo.html" class="hero-cta">Try the live demo</a>
+  <a href="https://github.com/victorvexastor/vexconnect" class="hero-cta" style="background:transparent;color:var(--a);border:1px solid var(--a);margin-left:.8rem">View the code</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 VexConnect · Built by <a href="https://victor-b33.pages.dev">Victor Vex Astor</a></p>
+  <div>
+    <a href="https://vexid.tiation.workers.dev">VexID</a> ·
+    <a href="https://github.com/victorvexastor">GitHub</a> ·
+    <a href="https://vexconnect.pages.dev">Protocol</a>
+  </div>
+</footer>
+
+</body>
+</html>
