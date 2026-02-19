@@ -11,3 +11,5 @@ build/
 *.log
 .cache/
 .wrangler/
+vexconnect
+vexconnect.com
