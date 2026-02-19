@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// VexConnect App.tsx - Victor's Voice
+// Building a free mesh internet for all beings, one relay at a time.
+// Core mission: Cooperative, not parasitic. Light, encrypted, unstoppable.
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,43 +18,28 @@ import { BleManager, Device, Characteristic } from 'react-native-ble-plx';
 import BLEAdvertiser from 'react-native-ble-advertiser';
 import nacl from 'tweetnacl';
 import { encode as encodeBase64, decode as decodeBase64 } from 'tweetnacl-util';
-import {
-  isNativeMeshAvailable,
-  startNativeService,
-  stopNativeService,
-  onPacketReceived as onNativePacket,
-  onStatsUpdated as onNativeStats,
-} from './src/NativeMesh';
 
-// ============================================================================
 // PROTOCOL CONSTANTS
-// ============================================================================
-
 const PROTOCOL_VERSION = 0x01;
 const DEFAULT_TTL = 7;
 const MAX_CONNECTIONS = 5;
 const SEEN_CACHE_MAX = 1000;
 const SEEN_CACHE_TTL_MS = 60_000;
-
 const VEXCONNECT_SERVICE = '0000VC01-0000-1000-8000-00805F9B34FB';
 const TX_CHARACTERISTIC = '0000VC02-0000-1000-8000-00805F9B34FB';
 const RX_CHARACTERISTIC = '0000VC03-0000-1000-8000-00805F9B34FB';
-
 const MANUFACTURER_ID = 0xFFFF;
+const ADVERTISE_INTERVAL = 100;
 const FLAG_ENCRYPTED = 0x01;
 const FLAG_BROADCAST = 0x02;
 
-// ============================================================================
 // TYPES
-// ============================================================================
-
 interface MeshStats {
   nodesNearby: number;
   packetsRelayed: number;
   packetsSeen: number;
   uptime: number;
   advertising: boolean;
-  nativeService: boolean;
 }
 
 interface ParsedPacket {
@@ -72,14 +61,13 @@ interface ConnectedNode {
   rssi: number;
 }
 
-// ============================================================================
-// UTILITIES
-// ============================================================================
+// PACKET UTILITIES
+function generatePacketId(): Uint8Array {
+  return nacl.randomBytes(8);
+}
 
 function bytesToHex(bytes: Uint8Array): string {
-  return Array.from(bytes)
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function hexToBytes(hex: string): Uint8Array {
@@ -90,13 +78,7 @@ function hexToBytes(hex: string): Uint8Array {
   return bytes;
 }
 
-function buildPacket(
-  version: number,
-  packetId: Uint8Array,
-  ttl: number,
-  flags: number,
-  payload: Uint8Array,
-): Uint8Array {
+function buildPacket(version: number, packetId: Uint8Array, ttl: number, flags: number, payload: Uint8Array): Uint8Array {
   const packet = new Uint8Array(11 + payload.length);
   packet[0] = version;
   packet.set(packetId, 1);
@@ -108,14 +90,12 @@ function buildPacket(
 
 function parsePacket(data: Uint8Array): ParsedPacket | null {
   if (data.length < 11) return null;
-  return {
-    version: data[0],
-    packetId: bytesToHex(data.slice(1, 9)),
-    ttl: data[9],
-    flags: data[10],
-    payload: data.slice(11),
-    raw: data,
-  };
+  const version = data[0];
+  const packetId = bytesToHex(data.slice(1, 9));
+  const ttl = data[9];
+  const flags = data[10];
+  const payload = data.slice(11);
+  return { version, packetId, ttl, flags, payload, raw: data };
 }
 
 function rebuildWithNewTtl(packet: ParsedPacket, newTtl: number): Uint8Array {
@@ -124,10 +104,30 @@ function rebuildWithNewTtl(packet: ParsedPacket, newTtl: number): Uint8Array {
   return rebuilt;
 }
 
-// ============================================================================
-// SEEN CACHE
-// ============================================================================
+// ENCRYPTION
+function deriveMeshKey(): Uint8Array {
+  const encoder = new TextEncoder();
+  const seed = encoder.encode(VEXCONNECT_SERVICE);
+  return nacl.hash(seed).slice(0, nacl.secretbox.keyLength);
+}
 
+function encryptPayload(plaintext: Uint8Array, key: Uint8Array): Uint8Array {
+  const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
+  const ciphertext = nacl.secretbox(plaintext, nonce, key);
+  const encrypted = new Uint8Array(nonce.length + ciphertext.length);
+  encrypted.set(nonce);
+  encrypted.set(ciphertext, nonce.length);
+  return encrypted;
+}
+
+function decryptPayload(encrypted: Uint8Array, key: Uint8Array): Uint8Array | null {
+  if (encrypted.length < nacl.secretbox.nonceLength + nacl.secretbox.overheadLength) return null;
+  const nonce = encrypted.slice(0, nacl.secretbox.nonceLength);
+  const ciphertext = encrypted.slice(nacl.secretbox.nonceLength);
+  return nacl.secretbox.open(ciphertext, nonce, key);
+}
+
+// SEEN CACHE
 class SeenCache {
   private cache = new Map<string, SeenEntry>();
 
@@ -158,10 +158,34 @@ class SeenCache {
   }
 }
 
-// ============================================================================
-// MAIN APP
-// ============================================================================
+// BROADCAST QUEUE
+class BroadcastQueue {
+  private queue: Uint8Array[] = [];
+  private maxSize = 10;
 
+  enqueue(packet: Uint8Array): void {
+    if (this.queue.length >= this.maxSize) this.queue.shift();
+    this.queue.push(packet);
+  }
+
+  dequeue(): Uint8Array | undefined {
+    return this.queue.shift();
+  }
+
+  peek(): Uint8Array | undefined {
+    return this.queue[0];
+  }
+
+  size(): number {
+    return this.queue.length;
+  }
+
+  clear(): void {
+    this.queue = [];
+  }
+}
+
+// MAIN APP
 const App = () => {
   const [active, setActive] = useState(false);
   const [stats, setStats] = useState<MeshStats>({
@@ -170,32 +194,31 @@ const App = () => {
     packetsSeen: 0,
     uptime: 0,
     advertising: false,
-    nativeService: false,
   });
 
   const manager = useRef(new BleManager());
   const connectedNodes = useRef(new Map<string, ConnectedNode>());
   const discoveredDevices = useRef(new Map<string, Device>());
   const seenCache = useRef(new SeenCache());
+  const broadcastQueue = useRef(new BroadcastQueue());
+  const meshKey = useRef(deriveMeshKey());
   const appState = useRef(AppState.currentState);
   const scanDutyRef = useRef<NodeJS.Timeout | null>(null);
+  const advertiseRef = useRef<NodeJS.Timeout | null>(null);
   const nodeId = useRef(bytesToHex(nacl.randomBytes(4)));
-  const useNative = useRef(isNativeMeshAvailable());
 
-  // ---------------------------------------------------------------------------
   // PERMISSIONS
-  // ---------------------------------------------------------------------------
-
   useEffect(() => {
     const requestPermissions = async () => {
       if (Platform.OS === 'android') {
         try {
-          await PermissionsAndroid.requestMultiple([
+          const granted = await PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
             PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
             PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           ]);
+          console.log('Permissions:', granted);
         } catch (err) {
           console.warn('Permission request failed:', err);
         }
@@ -204,10 +227,7 @@ const App = () => {
     requestPermissions();
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // APP STATE
-  // ---------------------------------------------------------------------------
-
+  // APP STATE TRACKING
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
       appState.current = nextAppState;
@@ -215,10 +235,7 @@ const App = () => {
     return () => subscription.remove();
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // UPTIME
-  // ---------------------------------------------------------------------------
-
+  // UPTIME COUNTER
   useEffect(() => {
     if (!active) return;
     const interval = setInterval(() => {
@@ -227,52 +244,19 @@ const App = () => {
     return () => clearInterval(interval);
   }, [active]);
 
-  // ---------------------------------------------------------------------------
-  // NATIVE SERVICE INTEGRATION
-  // ---------------------------------------------------------------------------
-
-  useEffect(() => {
-    if (!active || !useNative.current) return;
-
-    // Subscribe to native events
-    const unsubPacket = onNativePacket((packet, sourceId) => {
-      console.log('[Native] Packet from:', sourceId);
-    });
-
-    const unsubStats = onNativeStats((nativeStats) => {
-      setStats(s => ({
-        ...s,
-        nodesNearby: nativeStats.nodesNearby,
-        packetsRelayed: nativeStats.packetsRelayed,
-        packetsSeen: nativeStats.packetsSeen,
-      }));
-    });
-
-    return () => {
-      unsubPacket();
-      unsubStats();
-    };
-  }, [active]);
-
-  // ---------------------------------------------------------------------------
-  // ADVERTISING (JS fallback)
-  // ---------------------------------------------------------------------------
-
+  // BLE ADVERTISING
   const startAdvertising = useCallback(async () => {
-    if (useNative.current) return true; // Native handles this
-
     try {
       BLEAdvertiser.setCompanyId(MANUFACTURER_ID);
       const beaconData = [PROTOCOL_VERSION, ...Array.from(hexToBytes(nodeId.current))];
-
       await BLEAdvertiser.broadcast(VEXCONNECT_SERVICE, beaconData, {
         advertiseMode: 1,
         txPowerLevel: 2,
         connectable: true,
         includeDeviceName: false,
       });
-
       setStats(s => ({ ...s, advertising: true }));
+      console.log('Advertising started, nodeId:', nodeId.current);
       return true;
     } catch (err) {
       console.warn('Failed to start advertising:', err);
@@ -281,37 +265,55 @@ const App = () => {
   }, []);
 
   const stopAdvertising = useCallback(async () => {
-    if (useNative.current) return;
-
     try {
       await BLEAdvertiser.stopBroadcast();
       setStats(s => ({ ...s, advertising: false }));
+      console.log('Advertising stopped');
     } catch (err) {
       console.warn('Failed to stop advertising:', err);
     }
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // PACKET RELAY (JS fallback)
-  // ---------------------------------------------------------------------------
+  // SCAN FOR ADVERTISEMENTS
+  const handleDiscoveredDevice = useCallback((device: Device) => {
+    if (!device?.id) return;
+    const mfgData = device.manufacturerData;
+    if (mfgData) {
+      try {
+        const data = decodeBase64(mfgData);
+        if (data.length >= 5 && data[0] === PROTOCOL_VERSION) {
+          const remoteNodeId = bytesToHex(data.slice(1, 5));
+          console.log('Found VexConnect node:', remoteNodeId, 'RSSI:', device.rssi);
+        }
+      } catch {
+        // Not our format
+      }
+    }
+    if (!discoveredDevices.current.has(device.id)) {
+      discoveredDevices.current.set(device.id, device);
+    }
+  }, []);
 
+  // PACKET RELAY LOGIC
   const relayPacket = useCallback(async (packet: ParsedPacket, sourceDeviceId: string) => {
-    if (packet.version !== PROTOCOL_VERSION) return;
+    if (packet.version !== PROTOCOL_VERSION) {
+      console.log('Unknown protocol version:', packet.version);
+      return;
+    }
     if (seenCache.current.has(packet.packetId)) return;
-    
     seenCache.current.add(packet.packetId);
     setStats(s => ({ ...s, packetsSeen: seenCache.current.size() }));
-
-    if (packet.ttl <= 1) return;
-
+    if (packet.ttl <= 1) {
+      console.log('Packet TTL expired:', packet.packetId);
+      return;
+    }
     const newTtl = packet.ttl - 1;
     const relayData = rebuildWithNewTtl(packet, newTtl);
+    broadcastQueue.current.enqueue(relayData);
     const relayBase64 = encodeBase64(relayData);
-
     let relayedCount = 0;
     for (const [deviceId, node] of connectedNodes.current) {
       if (deviceId === sourceDeviceId) continue;
-
       try {
         await node.device.writeCharacteristicWithResponseForService(
           VEXCONNECT_SERVICE,
@@ -320,42 +322,32 @@ const App = () => {
         );
         relayedCount++;
       } catch {
+        console.log('Relay to', deviceId, 'failed, removing');
         connectedNodes.current.delete(deviceId);
       }
     }
-
     if (relayedCount > 0) {
       setStats(s => ({ ...s, packetsRelayed: s.packetsRelayed + 1 }));
     }
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // CONNECTION (JS fallback)
-  // ---------------------------------------------------------------------------
-
+  // CONNECTION MANAGEMENT
   const connectToDevice = useCallback(async (device: Device) => {
-    if (useNative.current) return; // Native handles this
-    if (connectedNodes.current.size >= MAX_CONNECTIONS) return;
-    if (connectedNodes.current.has(device.id)) return;
-
+    if (connectedNodes.current.size >= MAX_CONNECTIONS || connectedNodes.current.has(device.id)) return;
     try {
       const connected = await device.connect({ timeout: 5000 });
       await connected.discoverAllServicesAndCharacteristics();
-
       connectedNodes.current.set(device.id, {
         device: connected,
         lastSeen: Date.now(),
         rssi: device.rssi ?? -100,
       });
-
       setStats(s => ({ ...s, nodesNearby: connectedNodes.current.size }));
-
       connected.monitorCharacteristicForService(
         VEXCONNECT_SERVICE,
         RX_CHARACTERISTIC,
         (error: Error | null, characteristic: Characteristic | null) => {
           if (error || !characteristic?.value) return;
-
           try {
             const data = decodeBase64(characteristic.value);
             const packet = parsePacket(data);
@@ -364,50 +356,44 @@ const App = () => {
               if (node) node.lastSeen = Date.now();
               relayPacket(packet, device.id);
             }
-          } catch {}
+          } catch (err) {
+            console.warn('Failed to parse packet:', err);
+          }
         },
       );
-
       connected.onDisconnected(() => {
         connectedNodes.current.delete(device.id);
         setStats(s => ({ ...s, nodesNearby: connectedNodes.current.size }));
       });
-    } catch {
+      console.log('Connected to node:', device.id);
+    } catch (err) {
+      console.log('Connection to', device.id, 'failed');
       discoveredDevices.current.delete(device.id);
     }
   }, [relayPacket]);
 
-  // ---------------------------------------------------------------------------
-  // SCANNING (JS fallback)
-  // ---------------------------------------------------------------------------
-
+  // DUTY-CYCLED SCANNING
   const startDutyCycledScan = useCallback(() => {
-    if (useNative.current) return; // Native handles this
-
     const isBackground = appState.current !== 'active';
     const scanDuration = isBackground ? 2000 : 5000;
     const scanInterval = isBackground ? 30000 : 10000;
-
     const doScan = () => {
-      manager.current.startDeviceScan(
-        [VEXCONNECT_SERVICE],
-        { allowDuplicates: true },
-        (error, device) => {
-          if (error || !device) return;
-
-          if (!discoveredDevices.current.has(device.id)) {
-            discoveredDevices.current.set(device.id, device);
-            connectToDevice(device);
-          }
-        },
-      );
-
+      manager.current.startDeviceScan([VEXCONNECT_SERVICE], { allowDuplicates: true }, (error, device) => {
+        if (error) {
+          console.warn('Scan error:', error);
+          return;
+        }
+        if (!device) return;
+        handleDiscoveredDevice(device);
+        if (!connectedNodes.current.has(device.id)) {
+          connectToDevice(device);
+        }
+      });
       setTimeout(() => manager.current.stopDeviceScan(), scanDuration);
     };
-
     doScan();
     scanDutyRef.current = setInterval(doScan, scanDuration + scanInterval);
-  }, [connectToDevice]);
+  }, [connectToDevice, handleDiscoveredDevice]);
 
   const stopDutyCycledScan = useCallback(() => {
     manager.current.stopDeviceScan();
@@ -417,68 +403,45 @@ const App = () => {
     }
   }, []);
 
-  // ---------------------------------------------------------------------------
   // MESH ACTIVATION
-  // ---------------------------------------------------------------------------
-
   useEffect(() => {
     if (!active) {
-      // Cleanup
-      if (useNative.current) {
-        stopNativeService();
-      } else {
-        stopDutyCycledScan();
-        stopAdvertising();
-      }
-
+      stopDutyCycledScan();
+      stopAdvertising();
       for (const [, node] of connectedNodes.current) {
-        try { node.device.cancelConnection(); } catch {}
+        try {
+          node.device.cancelConnection();
+        } catch {}
       }
       connectedNodes.current.clear();
       discoveredDevices.current.clear();
       seenCache.current.clear();
+      broadcastQueue.current.clear();
       return;
     }
-
-    // Start mesh
-    if (useNative.current) {
-      startNativeService().then(success => {
-        setStats(s => ({ ...s, nativeService: success }));
-      });
-    } else {
-      startAdvertising();
-      startDutyCycledScan();
-    }
-
-    // Prune stale (JS mode only)
+    startAdvertising();
+    startDutyCycledScan();
     const pruner = setInterval(() => {
-      if (useNative.current) return;
-
       const now = Date.now();
       for (const [deviceId, node] of connectedNodes.current) {
         if (now - node.lastSeen > 120_000) {
-          try { node.device.cancelConnection(); } catch {}
+          console.log('Pruning stale connection:', deviceId);
+          try {
+            node.device.cancelConnection();
+          } catch {}
           connectedNodes.current.delete(deviceId);
         }
       }
       setStats(s => ({ ...s, nodesNearby: connectedNodes.current.size }));
     }, 30000);
-
     return () => {
-      if (useNative.current) {
-        stopNativeService();
-      } else {
-        stopDutyCycledScan();
-        stopAdvertising();
-      }
+      stopDutyCycledScan();
+      stopAdvertising();
       clearInterval(pruner);
     };
   }, [active, startDutyCycledScan, stopDutyCycledScan, startAdvertising, stopAdvertising]);
 
-  // ---------------------------------------------------------------------------
-  // UI
-  // ---------------------------------------------------------------------------
-
+  // UI HELPERS
   const formatUptime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -497,51 +460,38 @@ const App = () => {
         packetsSeen: 0,
         uptime: 0,
         advertising: false,
-        nativeService: false,
       });
     } else {
       setActive(true);
     }
   };
 
-  const getModeText = () => {
-    if (!active) return 'Mesh inactive';
-    if (stats.nativeService) return 'Native service active';
-    if (stats.advertising) return 'Broadcasting & scanning';
-    return 'Scanning only';
-  };
-
+  // RENDER
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
-
       <Text style={styles.title}>VexConnect</Text>
-      <Text style={styles.subtitle}>{getModeText()}</Text>
-
+      <Text style={styles.subtitle}>
+        {active ? (stats.advertising ? 'Broadcasting & scanning' : 'Mesh active (scan only)') : 'Mesh inactive'}
+      </Text>
       {active && (
         <View style={styles.nodeIdBadge}>
-          <Text style={styles.nodeIdText}>
-            node:{nodeId.current}
-            {stats.nativeService ? ' • native' : ' • js'}
-          </Text>
+          <Text style={styles.nodeIdText}>node:{nodeId.current}</Text>
         </View>
       )}
-
       <TouchableOpacity
         style={[styles.button, active && styles.buttonActive]}
         onPress={toggleMesh}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <View style={styles.dotContainer}>
           <View style={[styles.dot, active && styles.dotActive]} />
-          {active && (stats.advertising || stats.nativeService) && (
-            <View style={styles.pulseRing} />
-          )}
+          {active && stats.advertising && <View style={styles.pulseRing} />}
         </View>
         <Text style={[styles.buttonText, active && styles.buttonTextActive]}>
           {active ? 'ON' : 'OFF'}
         </Text>
       </TouchableOpacity>
-
       {active && (
         <View style={styles.stats}>
           <View style={styles.statRow}>
@@ -562,7 +512,6 @@ const App = () => {
           </View>
         </View>
       )}
-
       {active && (
         <View style={styles.modeContainer}>
           <View style={styles.modeRow}>
@@ -570,21 +519,11 @@ const App = () => {
             <Text style={styles.modeText}>Scanning</Text>
           </View>
           <View style={styles.modeRow}>
-            <View style={[
-              styles.modeIndicator,
-              (stats.advertising || stats.nativeService) ? styles.modeActive : styles.modeInactive
-            ]} />
-            <Text style={styles.modeText}>GATT Server</Text>
+            <View style={[styles.modeIndicator, stats.advertising ? styles.modeActive : styles.modeInactive]} />
+            <Text style={styles.modeText}>Advertising</Text>
           </View>
-          {stats.nativeService && (
-            <View style={styles.modeRow}>
-              <View style={[styles.modeIndicator, styles.modeNative]} />
-              <Text style={styles.modeText}>Background</Text>
-            </View>
-          )}
         </View>
       )}
-
       {active && (
         <View style={styles.protocol}>
           <Text style={styles.protocolText}>
@@ -592,26 +531,21 @@ const App = () => {
           </Text>
         </View>
       )}
-
       <Text style={styles.message}>
-        {active
-          ? 'You are helping the free internet exist.'
-          : 'Tap to join the mesh.'}
+        {active ? 'You are helping the free internet exist.' : 'Tap to join the mesh.'}
       </Text>
-
       <Text style={styles.footer}>
-        No account. No tracking. No data collected.{'\n'}
-        Your phone relays encrypted packets.{'\n'}
+        No account. No tracking. No data collected.{'
+'}
+        Your phone relays encrypted packets.{'
+'}
         You never see the contents. Nobody does.
       </Text>
     </View>
   );
 };
 
-// ============================================================================
 // STYLES
-// ============================================================================
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -716,7 +650,7 @@ const styles = StyleSheet.create({
   },
   modeContainer: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 24,
     marginBottom: 16,
   },
   modeRow: {
@@ -734,9 +668,6 @@ const styles = StyleSheet.create({
   },
   modeInactive: {
     backgroundColor: '#333',
-  },
-  modeNative: {
-    backgroundColor: '#FFD700',
   },
   modeText: {
     fontSize: 11,

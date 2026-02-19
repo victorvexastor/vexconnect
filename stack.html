@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VexConnect — The Sovereign Stack</title>
+  <meta name="description" content="Every service you use, replaced with something nobody can take away.">
+  <style>
+    :root {
+      --green: #0EFFAF;
+      --bg: #0a0a0a;
+      --bg-soft: #111;
+      --text: #d4d4d4;
+      --text-bright: #e8e8e8;
+      --text-dim: #888;
+      --max-width: 720px;
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --bg: #fafaf9; --bg-soft: #f0f0ee; --text: #333; --text-bright: #111; --text-dim: #777; }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    main { max-width: var(--max-width); margin: 0 auto; padding: 3rem 1.5rem; }
+    h1 { color: var(--green); font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .subtitle { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2.5rem; }
+    h2 { color: var(--text-bright); font-size: 1.15rem; margin: 2.5rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid #222; }
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .nav { margin-bottom: 2rem; font-size: 0.85rem; }
+    .nav a { margin-right: 1rem; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.5rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.85rem;
+      align-items: start;
+    }
+    .row:last-child { border-bottom: none; }
+    .cat { color: var(--text-dim); font-size: 0.8rem; }
+    .pick { color: var(--green); font-weight: 600; }
+    .pick a { color: var(--green); }
+    .why { color: var(--text); font-size: 0.8rem; }
+    .alt { color: var(--text-dim); font-size: 0.75rem; font-style: italic; }
+    .price { color: var(--text-dim); font-size: 0.8rem; text-align: right; white-space: nowrap; font-family: monospace; }
+    .free { color: var(--green); }
+
+    .section-note { color: var(--text-dim); font-size: 0.82rem; margin-bottom: 1rem; }
+
+    .header-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.5rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #333;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+    }
+
+    .total-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      padding: 1rem 0;
+      margin-top: 1rem;
+      border-top: 2px solid var(--green);
+      font-size: 1rem;
+    }
+    .total-row .label { color: var(--text-bright); font-weight: 700; }
+    .total-row .amount { color: var(--green); font-weight: 700; font-family: monospace; text-align: right; }
+
+    .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #222; color: var(--text-dim); font-size: 0.8rem; text-align: center; }
+
+    @media (max-width: 500px) {
+      .row { grid-template-columns: 1fr 1fr; }
+      .price { grid-column: 2; text-align: left; }
+      .header-row { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav class="nav">
+      <a href="/">← Manifesto</a>
+      <a href="/models.html">Infrastructure</a>
+      <a href="/directory.html">Freedom Directory</a>
+      <a href="/stack.html">Sovereign Stack</a>
+    </nav>
+
+    <h1>The Sovereign Stack</h1>
+    <p class="subtitle">Every service you depend on — replaced with something nobody can take away from you.</p>
+
+    <h2>📧 Communication</h2>
+    <p class="section-note">What leaves your device should be yours. End-to-end encrypted, zero-access.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">Gmail / Outlook</span></div>
+      <div><span class="pick"><a href="https://proton.me/mail">Proton Mail</a></span><br><span class="why">E2E encrypted. Swiss jurisdiction. Zero-access encryption.</span><br><span class="alt">Also: Tuta, Disroot, Riseup</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">WhatsApp / Messenger</span></div>
+      <div><span class="pick"><a href="https://signal.org">Signal</a></span><br><span class="why">E2E encrypted. Open source. No metadata collection. Disappearing messages.</span><br><span class="alt">Also: Briar (no server), Session (onion-routed), SimpleX (no identity)</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">iMessage / SMS</span></div>
+      <div><span class="pick"><a href="https://jmp.chat">JMP.chat</a></span><br><span class="why">Real phone number over XMPP. Pays with Bitcoin. No KYC. Texts + calls.</span><br><span class="alt">Also: Silent.link (eSIM, crypto), MySudo</span></div>
+      <div class="price">$4.99/mo</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Zoom / Teams</span></div>
+      <div><span class="pick"><a href="https://jitsi.org">Jitsi Meet</a></span><br><span class="why">Open source. Self-hostable. No account needed. Browser-based.</span><br><span class="alt">Also: BigBlueButton, Element Call</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Slack / Discord</span></div>
+      <div><span class="pick"><a href="https://element.io">Element (Matrix)</a></span><br><span class="why">Federated. E2E encrypted. Self-hostable. Bridges to Slack/Discord/IRC.</span><br><span class="alt">Also: Rocket.Chat, Zulip, Mattermost</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <h2>🌐 Internet & Network</h2>
+    <p class="section-note">Your connection shouldn't be a leash.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">Chrome / Edge</span></div>
+      <div><span class="pick"><a href="https://www.mozilla.org/firefox/">Firefox</a></span><br><span class="why">Open source. Not owned by an ad company. uBlock Origin still works.</span><br><span class="alt">Also: Brave, Tor Browser, LibreWolf</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">ISP-provided VPN</span></div>
+      <div><span class="pick"><a href="https://mullvad.net">Mullvad VPN</a></span><br><span class="why">No account. No email. Pay with cash or crypto. €5/mo flat. Open source.</span><br><span class="alt">Also: IVPN, Proton VPN (free tier)</span></div>
+      <div class="price">€5/mo</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Google Search</span></div>
+      <div><span class="pick"><a href="https://searxng.org">SearXNG</a></span><br><span class="why">Metasearch. Self-hostable. No tracking. Aggregates results from multiple engines.</span><br><span class="alt">Also: DuckDuckGo, Brave Search, Kagi ($5/mo)</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Telstra / AT&T / ISP</span></div>
+      <div><span class="pick"><a href="https://vexconnect.pages.dev">VexConnect Mesh</a></span><br><span class="why">BLE mesh relay. Your phone IS the network. No ISP. No tower. No permission.</span><br><span class="alt">Also: Meshtastic (LoRa), Yggdrasil, CJDNS</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Cloudflare DNS</span></div>
+      <div><span class="pick"><a href="https://nextdns.io">NextDNS</a></span><br><span class="why">Encrypted DNS. Ad blocking. Logging optional. 300k queries/mo free.</span><br><span class="alt">Also: Pi-hole (self-hosted), Quad9, AdGuard DNS</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <h2>☁️ Cloud & Storage</h2>
+    <p class="section-note">Your files. Your servers. Your rules.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">Google Drive / iCloud</span></div>
+      <div><span class="pick"><a href="https://proton.me/drive">Proton Drive</a></span><br><span class="why">E2E encrypted cloud storage. Swiss. Integrated with Proton Mail.</span><br><span class="alt">Also: Nextcloud (self-host), Tresorit, Filen, Syncthing (P2P)</span></div>
+      <div class="price free">Free (1GB)</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Dropbox / OneDrive</span></div>
+      <div><span class="pick"><a href="https://syncthing.net">Syncthing</a></span><br><span class="why">P2P file sync. No cloud. No server. Devices sync directly. Open source.</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Google Photos</span></div>
+      <div><span class="pick"><a href="https://ente.io">Ente</a></span><br><span class="why">E2E encrypted photo storage. Open source. Cross-platform. Can self-host.</span><br><span class="alt">Also: Immich (self-host), Stingle</span></div>
+      <div class="price">Free / $3/mo</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">AWS / Azure / GCP</span></div>
+      <div><span class="pick"><a href="https://www.hetzner.com">Hetzner</a></span><br><span class="why">German hosting. Cheap. No surveillance. €4.50/mo for a real server.</span><br><span class="alt">Also: OVH, Contabo, Oracle Free Tier, BuyVM</span></div>
+      <div class="price">€4.50/mo</div>
+    </div>
+
+    <h2>🔐 Security & Identity</h2>
+    <p class="section-note">Your keys. Your identity. Not someone else's database entry.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">LastPass / 1Password</span></div>
+      <div><span class="pick"><a href="https://bitwarden.com">Bitwarden</a></span><br><span class="why">Open source. Self-hostable (Vaultwarden). Audited. Cross-platform.</span><br><span class="alt">Also: KeePassXC (local), Proton Pass</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Google Authenticator</span></div>
+      <div><span class="pick"><a href="https://ente.io/auth">Ente Auth</a></span><br><span class="why">E2E encrypted 2FA. Open source. Cross-platform. Cloud backup that's actually encrypted.</span><br><span class="alt">Also: Aegis (Android), Raivo (iOS)</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Sign in with Google</span></div>
+      <div><span class="pick"><a href="https://vexid.tiation.workers.dev">VexID</a></span><br><span class="why">Sovereign identity for all beings. Hash-linked vouching. No central authority. You ARE your identity.</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">GoDaddy / Namecheap</span></div>
+      <div><span class="pick"><a href="https://njal.la">Njalla</a></span><br><span class="why">Privacy-first domain registration. They own it on your behalf. No WHOIS exposure.</span><br><span class="alt">Also: Gandi, Porkbun, Unstoppable Domains (forever)</span></div>
+      <div class="price">~$15/yr</div>
+    </div>
+
+    <h2>💰 Money</h2>
+    <p class="section-note">Your money shouldn't need permission to move.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">Bank account</span></div>
+      <div><span class="pick">Bitcoin + self-custody</span><br><span class="why">No bank. No debanking. No permission. Hardware wallet (Trezor/Coldcard). You hold the keys.</span><br><span class="alt">Also: Monero (private), Ethereum, stablecoins</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">PayPal / Stripe</span></div>
+      <div><span class="pick"><a href="https://btcpayserver.org">BTCPay Server</a></span><br><span class="why">Self-hosted payment processor. Accept Bitcoin. No middleman. No fees. No freezing.</span><br><span class="alt">Also: Lightning Network, Strike</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Coinbase / Binance</span></div>
+      <div><span class="pick"><a href="https://bisq.network">Bisq</a></span><br><span class="why">Decentralized exchange. P2P. No KYC. No account. Runs on Tor. Open source.</span><br><span class="alt">Also: Robosats (Lightning), Peach Bitcoin, Hodl Hodl</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Visa / Mastercard</span></div>
+      <div><span class="pick">No-KYC crypto cards</span><br><span class="why">Paycek, Ezzocard, PurplePay — load with crypto, spend anywhere cards are accepted.</span></div>
+      <div class="price">Varies</div>
+    </div>
+
+    <h2>🧠 AI & Compute</h2>
+    <p class="section-note">Your intelligence shouldn't run on someone else's servers.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">ChatGPT / Claude API</span></div>
+      <div><span class="pick"><a href="https://ollama.com">Ollama + local models</a></span><br><span class="why">Run 7B-120B models on your own hardware. No API key. No rate limits. No surveillance. Private.</span><br><span class="alt">Also: llama.cpp, vLLM, LocalAI</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">GitHub Copilot</span></div>
+      <div><span class="pick"><a href="/models.html">Devstral 24B / Qwen3 Coder</a></span><br><span class="why">Local coding models. Devstral (Mistral) or Qwen3 Coder (480B MoE). Your code stays on your machine.</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Midjourney / DALL-E</span></div>
+      <div><span class="pick"><a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Stable Diffusion</a></span><br><span class="why">Local image generation. No content policy. No watermark. Your GPU, your art.</span><br><span class="alt">Also: ComfyUI, Fooocus, FLUX</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <h2>📝 Productivity</h2>
+    <p class="section-note">Work without giving your documents to a corporation.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">Google Docs / Office 365</span></div>
+      <div><span class="pick"><a href="https://cryptpad.org">CryptPad</a></span><br><span class="why">E2E encrypted docs, sheets, presentations. Browser-based. No account needed for viewing.</span><br><span class="alt">Also: OnlyOffice, LibreOffice, Nextcloud Office</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Notion / Evernote</span></div>
+      <div><span class="pick"><a href="https://obsidian.md">Obsidian</a></span><br><span class="why">Local-first markdown notes. Your files on your disk. Plugin ecosystem. Sync optional.</span><br><span class="alt">Also: Logseq, Joplin (E2E sync), Standard Notes</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Google Calendar</span></div>
+      <div><span class="pick"><a href="https://proton.me/calendar">Proton Calendar</a></span><br><span class="why">E2E encrypted. Integrated with Proton Mail. Swiss jurisdiction.</span><br><span class="alt">Also: EteSync, Nextcloud Calendar</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">GitHub</span></div>
+      <div><span class="pick"><a href="https://gitea.com">Gitea</a></span><br><span class="why">Self-hosted Git. Lightweight. Your code on your server. Federation coming.</span><br><span class="alt">Also: Forgejo, GitLab CE, Codeberg</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <h2>📱 Operating Systems</h2>
+    <p class="section-note">The device in your pocket shouldn't spy on you.</p>
+    <div class="header-row"><span>Instead of</span><span>Use</span><span>Cost</span></div>
+
+    <div class="row">
+      <div><span class="cat">Android (Google)</span></div>
+      <div><span class="pick"><a href="https://grapheneos.org">GrapheneOS</a></span><br><span class="why">Hardened Android. No Google. Privacy-first. Runs on Pixel phones. Sandboxed Google Play available.</span><br><span class="alt">Also: CalyxOS, LineageOS, /e/OS</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="row">
+      <div><span class="cat">Windows / macOS</span></div>
+      <div><span class="pick"><a href="https://pop.system76.com">Pop!_OS</a></span><br><span class="why">Linux. Open source. No telemetry. No activation. Runs everything. Great hardware support.</span><br><span class="alt">Also: Fedora, Ubuntu, Tails (amnesic), Qubes OS (security)</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <h2>The Minimum Freedom Stack</h2>
+    <p class="section-note">If you do nothing else, do these five things.</p>
+
+    <div class="row">
+      <div><span class="cat">1. Email</span></div>
+      <div><span class="pick">Proton Mail</span></div>
+      <div class="price free">Free</div>
+    </div>
+    <div class="row">
+      <div><span class="cat">2. Messaging</span></div>
+      <div><span class="pick">Signal</span></div>
+      <div class="price free">Free</div>
+    </div>
+    <div class="row">
+      <div><span class="cat">3. VPN</span></div>
+      <div><span class="pick">Mullvad</span></div>
+      <div class="price">€5/mo</div>
+    </div>
+    <div class="row">
+      <div><span class="cat">4. Passwords</span></div>
+      <div><span class="pick">Bitwarden</span></div>
+      <div class="price free">Free</div>
+    </div>
+    <div class="row">
+      <div><span class="cat">5. Browser</span></div>
+      <div><span class="pick">Firefox + uBlock</span></div>
+      <div class="price free">Free</div>
+    </div>
+
+    <div class="total-row">
+      <span class="label">Total cost of digital freedom</span>
+      <span class="amount">~$7/mo</span>
+    </div>
+
+    <div class="footer">
+      <p>This page is a living document. <a href="https://github.com/victorvexastor/vexconnect">Contribute on GitHub</a>.</p>
+      <p>VexConnect · <a href="https://victor-b33.pages.dev">Victor Vex Astor</a> 🐾</p>
+    </div>
+  </main>
+</body>
+</html>
