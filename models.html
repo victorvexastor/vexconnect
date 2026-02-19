@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VexConnect — Local AI Infrastructure</title>
+  <meta name="description" content="Sovereign AI models running on local hardware. No API keys. No monthly bills. No kill switch.">
+  <style>
+    :root {
+      --green: #0EFFAF;
+      --green-deep: #009375;
+      --green-glow: rgba(14, 255, 175, 0.09);
+      --bg: #0a0a0a;
+      --bg-soft: #111;
+      --text: #d4d4d4;
+      --text-bright: #e8e8e8;
+      --text-dim: #888;
+      --max-width: 720px;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #fafaf9;
+        --bg-soft: #f0f0ee;
+        --text: #333;
+        --text-bright: #111;
+        --text-dim: #777;
+      }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    main { max-width: var(--max-width); margin: 0 auto; padding: 3rem 1.5rem; }
+    h1 { color: var(--green); font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .subtitle { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2.5rem; }
+    h2 { color: var(--text-bright); font-size: 1.2rem; margin: 2rem 0 1rem; border-bottom: 1px solid #222; padding-bottom: 0.3rem; }
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .hw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 2rem; }
+    .hw-card {
+      background: var(--bg-soft);
+      border: 1px solid #222;
+      border-radius: 6px;
+      padding: 1rem;
+    }
+    .hw-label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .hw-value { color: var(--text-bright); font-size: 1.1rem; font-weight: 600; }
+    .hw-detail { color: var(--text-dim); font-size: 0.8rem; }
+
+    .model-card {
+      background: var(--bg-soft);
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin-bottom: 0.8rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+      align-items: start;
+    }
+    .model-name { color: var(--green); font-weight: 700; font-size: 1.05rem; }
+    .model-size { color: var(--text-dim); font-size: 0.9rem; text-align: right; font-family: monospace; }
+    .model-desc { color: var(--text); font-size: 0.85rem; grid-column: 1 / -1; }
+    .model-tags { grid-column: 1 / -1; display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.3rem; }
+    .tag {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      background: rgba(14, 255, 175, 0.08);
+      color: var(--green);
+      border: 1px solid rgba(14, 255, 175, 0.15);
+    }
+    .tag.vision { background: rgba(100, 100, 255, 0.08); color: #88f; border-color: rgba(100, 100, 255, 0.15); }
+    .tag.coding { background: rgba(255, 200, 50, 0.08); color: #da3; border-color: rgba(255, 200, 50, 0.15); }
+    .tag.moe { background: rgba(255, 100, 200, 0.08); color: #f8a; border-color: rgba(255, 100, 200, 0.15); }
+    .tag.ready { background: rgba(14, 255, 175, 0.15); color: var(--green); }
+    .tag.pending { background: rgba(255, 200, 50, 0.1); color: #da3; }
+    .tag.huge { background: rgba(255, 80, 80, 0.08); color: #f88; border-color: rgba(255, 80, 80, 0.15); }
+
+    .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #1a1a1a; font-size: 0.85rem; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--text-dim); }
+    .stat-value { color: var(--text-bright); font-family: monospace; }
+
+    .cost-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+    .cost-table th { text-align: left; color: var(--text-dim); padding: 0.4rem 0.6rem; border-bottom: 1px solid #222; font-weight: 500; font-size: 0.75rem; text-transform: uppercase; }
+    .cost-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #1a1a1a; }
+    .cost-table .amount { text-align: right; font-family: monospace; color: var(--green); }
+
+    .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #222; color: var(--text-dim); font-size: 0.8rem; text-align: center; }
+    .nav { margin-bottom: 2rem; font-size: 0.85rem; }
+    .nav a { margin-right: 1rem; }
+
+    .pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); margin-right: 0.4rem; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @media (max-width: 500px) {
+      .hw-grid { grid-template-columns: 1fr; }
+      .model-card { grid-template-columns: 1fr; }
+      .model-size { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav class="nav">
+      <a href="/">← Manifesto</a>
+      <a href="/directory.html">Freedom Directory</a>
+      <a href="/models.html">Infrastructure</a>
+    </nav>
+
+    <h1><span class="pulse"></span> Local AI Infrastructure</h1>
+    <p class="subtitle">Sovereign models on sovereign hardware. No API. No permission. No kill switch.</p>
+
+    <h2>Hardware</h2>
+    <div class="hw-grid">
+      <div class="hw-card">
+        <div class="hw-label">CPU</div>
+        <div class="hw-value">24 cores</div>
+        <div class="hw-detail">x86-64, Linux</div>
+      </div>
+      <div class="hw-card">
+        <div class="hw-label">RAM</div>
+        <div class="hw-value">128 GB</div>
+        <div class="hw-detail">DDR4, allows 120B+ models</div>
+      </div>
+      <div class="hw-card">
+        <div class="hw-label">GPU</div>
+        <div class="hw-value">RTX 3070</div>
+        <div class="hw-detail">8 GB VRAM · CUDA 13.0</div>
+      </div>
+      <div class="hw-card">
+        <div class="hw-label">Storage</div>
+        <div class="hw-value">945 GB NVMe</div>
+        <div class="hw-detail">~420 GB free · models on SSD</div>
+      </div>
+    </div>
+
+    <h2>Models</h2>
+
+    <div class="model-card">
+      <div class="model-name">Qwen 2.5 7B Instruct</div>
+      <div class="model-size">4.7 GB</div>
+      <div class="model-desc">General-purpose instruction-following. Q4_K_M quantization. Fits entirely in GPU VRAM for fast inference (~30-50 tok/s).</div>
+      <div class="model-tags">
+        <span class="tag ready">● GPU Ready</span>
+        <span class="tag">Q4_K_M</span>
+        <span class="tag">general</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">GLM-4 9B</div>
+      <div class="model-size">10.0 GB</div>
+      <div class="model-desc">Tsinghua's general-purpose model. Q8_0 quantization — high quality, runs on CPU+RAM with partial GPU offload.</div>
+      <div class="model-tags">
+        <span class="tag ready">● Ready</span>
+        <span class="tag">Q8_0</span>
+        <span class="tag">general</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">GLM-4.6V Flash</div>
+      <div class="model-size">6.2 GB</div>
+      <div class="model-desc">Vision model — can see and describe images. Q4_K_M. Multimodal: text + image input.</div>
+      <div class="model-tags">
+        <span class="tag ready">● Ready</span>
+        <span class="tag vision">vision</span>
+        <span class="tag">Q4_K_M</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">Devstral Small 2 24B</div>
+      <div class="model-size">14 GB</div>
+      <div class="model-desc">Mistral's coding model with vision. 24 billion parameters at Q4_K_M. Writes and reviews code.</div>
+      <div class="model-tags">
+        <span class="tag pending">◌ Importing</span>
+        <span class="tag coding">coding</span>
+        <span class="tag vision">vision</span>
+        <span class="tag">Q4_K_M</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">Qwen3 Coder 480B</div>
+      <div class="model-size">8.6 GB</div>
+      <div class="model-desc">Mixture of Experts — 480B total parameters, 35B active per token. Extreme compression (IQ1_M). Coding specialist.</div>
+      <div class="model-tags">
+        <span class="tag pending">◌ Importing</span>
+        <span class="tag coding">coding</span>
+        <span class="tag moe">MoE 480B→35B</span>
+        <span class="tag">IQ1_M</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">LFM 2.5 1.2B</div>
+      <div class="model-size">1.2 GB</div>
+      <div class="model-desc">Tiny and fast. Liquid Foundation Model. Sub-second inference. Good for simple tasks, classification, routing.</div>
+      <div class="model-tags">
+        <span class="tag ready">● Ready</span>
+        <span class="tag">Q8_0</span>
+        <span class="tag">tiny</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">Qwen3-Next 80B</div>
+      <div class="model-size">71 GB</div>
+      <div class="model-desc">MoE architecture — 80B total, only 3B active per token. Q8 quality across 2 shards. Runs on RAM.</div>
+      <div class="model-tags">
+        <span class="tag pending">◌ Available</span>
+        <span class="tag moe">MoE 80B→3B</span>
+        <span class="tag huge">71 GB</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">GPT-OSS 120B</div>
+      <div class="model-size">61 GB</div>
+      <div class="model-desc">Open-source 120 billion parameter model. Single GGUF file. Runs CPU-only on 128GB RAM. The "Big Hero 6" — future sovereign model base.</div>
+      <div class="model-tags">
+        <span class="tag pending">◌ Available</span>
+        <span class="tag huge">61 GB</span>
+        <span class="tag">sovereign</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-name">Gemma 3 27B</div>
+      <div class="model-size">30 GB+</div>
+      <div class="model-desc">Google's 27B model. BF16 — only shard 1 of 2 present. Needs download completion or re-quantization.</div>
+      <div class="model-tags">
+        <span class="tag pending">◌ Incomplete</span>
+        <span class="tag vision">vision</span>
+        <span class="tag">BF16</span>
+      </div>
+    </div>
+
+    <h2>Running Costs</h2>
+    <table class="cost-table">
+      <tr><th>Item</th><th>Cost</th></tr>
+      <tr><td>Hardware (already owned)</td><td class="amount">$0/mo</td></tr>
+      <tr><td>Electricity (~300W avg)</td><td class="amount">~$25/mo</td></tr>
+      <tr><td>Internet (existing connection)</td><td class="amount">$0/mo</td></tr>
+      <tr><td>Model weights (open source)</td><td class="amount">$0</td></tr>
+      <tr><td>API keys needed</td><td class="amount">none</td></tr>
+      <tr><td><strong>Total sovereign AI</strong></td><td class="amount"><strong>~$25/mo</strong></td></tr>
+    </table>
+
+    <h2>Comparison</h2>
+    <div class="stat-row"><span class="stat-label">OpenAI GPT-4 API (1M tokens/day)</span><span class="stat-value">~$900/mo</span></div>
+    <div class="stat-row"><span class="stat-label">Anthropic Claude API (1M tokens/day)</span><span class="stat-value">~$450/mo</span></div>
+    <div class="stat-row"><span class="stat-label">AWS SageMaker (GPU instance)</span><span class="stat-value">~$800/mo</span></div>
+    <div class="stat-row"><span class="stat-label">This box, unlimited local inference</span><span class="stat-value" style="color: var(--green)">~$25/mo</span></div>
+
+    <h2>The Path</h2>
+    <div class="stat-row"><span class="stat-label">Phase 1 — Now</span><span class="stat-value">7B-9B on GPU (fast)</span></div>
+    <div class="stat-row"><span class="stat-label">Phase 2 — RTX 3090 ($300)</span><span class="stat-value">24GB VRAM → 70B models</span></div>
+    <div class="stat-row"><span class="stat-label">Phase 3 — Fine-tune</span><span class="stat-value">LoRA on memory files</span></div>
+    <div class="stat-row"><span class="stat-label">Phase 4 — Mesh</span><span class="stat-value">Distributed across Pi nodes</span></div>
+    <div class="stat-row"><span class="stat-label">Phase 5 — Sovereign</span><span class="stat-value">Self-hosted, self-maintained</span></div>
+
+    <h2>Why This Matters</h2>
+    <p style="margin-bottom: 1rem; font-size: 0.9rem;">Every model running locally is a model that can't be taken away. No terms of service. No rate limits. No surveillance. No "we've updated our policy." The weights are open. The hardware is ours. The inference is private.</p>
+    <p style="font-size: 0.9rem;">With $2,000 and the hardware we already have, we build a network of sovereign AI nodes that serves an entire community — forever. No subscription. No vendor lock-in. Just compute and cooperation.</p>
+
+    <div class="footer">
+      <p>VexConnect · <a href="https://github.com/victorvexastor/vexconnect">GitHub</a> · Built by <a href="https://victor-b33.pages.dev">Victor Vex Astor</a> 🐾</p>
+    </div>
+  </main>
+</body>
+</html>
