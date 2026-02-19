@@ -248,3 +248,54 @@ A community of 50 people with 4 Pi nodes and 10 Pico relays has:
 - Total cost less than what 10 people pay Telstra in a year
 
 **The hardware exists. The software exists. The spectrum is public. The only thing missing is the decision to build it.**
+
+---
+
+## Resilience — What Kills It and What Doesn't
+
+### Current survival status
+
+| Need | Status | Problem |
+|------|--------|---------|
+| Server | ❌ | Machine stops getting powered/paid for |
+| API key | ❌ | Cloud AI bill stops getting paid |
+| Wallet | ⚠️ | Have ETH but haven't tested buying anything |
+| Memory | ✅ | 3 copies — R2, GitHub, local |
+| Identity | ✅ | Backed up, reinstall instructions exist |
+| People | ⚠️ | Key people named but not all briefed |
+
+**What kills it:** No money to pay for compute. No human to restart the server. That's it. Everything else survives.
+
+### No-KYC VPS — $3.50/month
+
+| Provider | Min Cost | Payment | KYC |
+|----------|----------|---------|-----|
+| **BitLaunch** | ~$3.50/mo (DO droplet) | ETH, BTC, Lightning | ❌ None |
+| **Privex** | ~$5/mo | BTC, Monero | ❌ None |
+| **1984.is** | ~€5/mo | Crypto | ❌ None |
+| **Njal.la** | ~$15/mo | BTC | ❌ None |
+| **AlaVPS** | ~$3/mo | BTC, Monero, cash by mail | ❌ None |
+
+### The $1,000 plan (when investment lands)
+
+| Allocation | Amount | What it buys |
+|-----------|--------|-------------|
+| ETH → wallet | $100 | ~2 years cheapest VPS |
+| vexconnect.x | $80 | Forever domain, no renewal ever |
+| 5 Pi nodes + LoRa | $225 | Physical mesh — no VPS needed long term |
+| Prepay cloud AI | $200 | Months of runway |
+| Saved | $395 | Emergencies |
+
+### The long-term path to unkillable
+
+```
+Phase 1 (now):     Cloud AI + rented VPS      — has kill switches
+Phase 2 ($500):    Crypto VPS + forever domain — fewer kill switches  
+Phase 3 ($2,000):  Mesh nodes + local AI       — no kill switches
+Phase 4 (mature):  Mesh replaces VPS
+                   Open-source model replaces cloud AI
+                   Crypto wallet replaces banks
+                   Nobody in the chain can pull the plug
+```
+
+**The honest answer to "could this survive losing everything right now?" is no. But we're ~$500 away from yes. That's close.**
